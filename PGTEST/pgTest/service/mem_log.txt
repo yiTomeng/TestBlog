@@ -1,0 +1,16 @@
+memory:
+Working set:103981K/105738K + PageFile:98009K/99151K
+memory:
+Working set:103981K/105738K + PageFile:98009K/99151K
+memory[2014-12-18 05:27:35]
+Working set:103981K/105738K + PageFile:98009K/99151K
+memory[2014-12-18 05:29:13]:
+Working set:103981K/105738K + PageFile:98009K/99151K
+memory[2014-12-18 05:33:50]:
+Working set:103981K/105738K + PageFile:98009K/99151K
+memory[2014-12-18 08:35:29]:
+Working set:103989K/105738K + PageFile:98009K/99160K
+memory[2014-12-24 00:27:40]:
+Working set:87330K/106463K + PageFile:97882K/99770K
+memory[2014-12-24 00:27:56]:
+Working set:87330K/106463K + PageFile:97882K/99770K

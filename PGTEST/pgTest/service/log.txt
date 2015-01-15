@@ -1,0 +1,2 @@
+memory:
+Working set:103960K/105521K + PageFile:97406K/98492K
