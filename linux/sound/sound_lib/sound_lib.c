@@ -1,11 +1,11 @@
 /******************************************************************************
- * SYSTEM       :   西JR BUS音声放送LIB
+ * SYSTEM       :   音声放送LIB
  * PROGRAM      :   放送を行うライブラリ
  * MODULE       :   sound_lib.c  
  * REMARKS      :
  * HISTORY      :
  * ID-----------DATE--------NAME----------NOTE --------------------------------
- * [V01.00.00]  2015.2.2   KOCHI.晏       初期作成
+ * [V01.00.00]  2015.2.2    晏       初期作成
  *****************************************************************************/
 
 #include <fcntl.h> 
@@ -93,7 +93,7 @@ static int dsp_play(int *dsp, play_wave_info *wave_info);										//放送
  * REMARKS      : 備考
  * HISTORY      :
  * ID-----------DATE--------NAME----------NOTE --------------------------------
- * [V01.00.00]  2015.02.02  KOCHI.晏         西JR BUS
+ * [V01.00.00]  2015.02.02  晏      
  *************************************************************************EOH*/
 
 int play_wave(const char *filename, int refresh_times)
@@ -164,7 +164,7 @@ int play_wave(const char *filename, int refresh_times)
  * REMARKS      : 備考
  * HISTORY      :
  * ID-----------DATE--------NAME----------NOTE --------------------------------
- * [V01.00.00]  2015.02.02  KOCHI.晏         西JR BUS
+ * [V01.00.00]  2015.02.02  晏         
   *************************************************************************EOH*/
 
 static void wave_init(const char *filename, play_wave_info *wave_info, int refresh_count)
@@ -188,7 +188,7 @@ static void wave_init(const char *filename, play_wave_info *wave_info, int refre
  * REMARKS      : 備考
  * HISTORY      :
  * ID-----------DATE--------NAME----------NOTE --------------------------------
- * [V01.00.00]  2015.02.02  KOCHI.晏         西JR BUS
+ * [V01.00.00]  2015.02.02  晏         
   *************************************************************************EOH*/
 
 static int wave_read_file_header(play_wave_info *wave_info)
@@ -300,7 +300,7 @@ static int wave_read_file_header(play_wave_info *wave_info)
  * REMARKS      : 備考
  * HISTORY      :
  * ID-----------DATE--------NAME----------NOTE --------------------------------
- * [V01.00.00]  2015.02.02  KOCHI.晏         西JR BUS
+ * [V01.00.00]  2015.02.02  晏         
   *************************************************************************EOH*/
 
 static int set_dsp(int *dsp, play_wave_info *wave_info)
@@ -368,7 +368,7 @@ static int set_dsp(int *dsp, play_wave_info *wave_info)
  * REMARKS      : 備考
  * HISTORY      :
  * ID-----------DATE--------NAME----------NOTE --------------------------------
- * [V01.00.00]  2015.02.02  KOCHI.晏         西JR BUS
+ * [V01.00.00]  2015.02.02  晏         
   *************************************************************************EOH*/
 
 static int dsp_play(int *dsp, play_wave_info *wave_info)
