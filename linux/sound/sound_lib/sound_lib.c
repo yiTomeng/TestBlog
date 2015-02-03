@@ -347,6 +347,9 @@ static int set_dsp(int *dsp, play_wave_info *wave_info)
 	backup_rate = rate;
 	
 	//デバイスのフォーマットを設定する
+	//デバイスのフォーマットを設定するとき(ioctlを使うとき)、
+	//サポートされない時に、エラーなしで他のサポートできるフォーマットを引数に格納し、採用することもあるので、
+	//ioctlを呼び出した後、引数のフォーマットをチェックしないといけないのです。
 	if ( (ioctl( *dsp, SNDCTL_DSP_SETFMT, &format ) == -1) || (backup_fmt != format) ) 
 	{
 		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_SET_FMT] );
@@ -354,6 +357,9 @@ static int set_dsp(int *dsp, play_wave_info *wave_info)
 	}
 
 	//デバイスのサンプリングの周波数を設定
+	//デバイスの周波数を設定するとき(ioctlを使うとき)、
+	//サポートされない時に、エラーなしで他のサポートできる周波数(もっとも近く周波数)を引数に格納し、採用することもあるので、
+	//ioctlを呼び出した後、引数の周波数をチェックしないといけないのです。
 	if ( (ioctl( *dsp, SOUND_PCM_WRITE_RATE, &wave_info->wave_header.sample_rate ) == -1 ) || (backup_rate != rate) ) 
 	{
 		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_WRITE_RATE] );
