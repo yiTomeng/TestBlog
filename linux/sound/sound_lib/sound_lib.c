@@ -306,7 +306,10 @@ static int wave_read_file_header(play_wave_info *wave_info)
 static int set_dsp(int *dsp, play_wave_info *wave_info)
 {
 	int format = 0;					//フォーマットの初期化
-
+	int backup_fmt = 0;				//フォーマットのバックアップ
+	int rate = 0;					//サンプリング周波数
+	int backup_rate = 0;			//サンプリング周波数のバックアップ
+	
 	//メディアフォーマットは"1"でなければ、PCMフォーマットではないと判断します。(この状態は別の圧縮ファイルになってしまう)
 	if ( 1 != wave_info->wave_header.audio_format)
 	{
@@ -317,17 +320,22 @@ static int set_dsp(int *dsp, play_wave_info *wave_info)
 	
 	//量子化ビット数をチェックする
 	//8bitの場合：フォーマットに"AFMT_U8"を設定する　　
-	if ( wave_info->wave_header.bits_per_sample == 8 ) {
+	if ( wave_info->wave_header.bits_per_sample == 8 ) 
+	{
 		format = AFMT_U8;
+		backup_fmt = format;
 	}
 	
 	//16bitの場合：フォーマットに"AFMT_S16_LE"を設定する
-	else if ( wave_info->wave_header.bits_per_sample == 16 ) {
+	else if ( wave_info->wave_header.bits_per_sample == 16 ) 
+	{
 		format = AFMT_S16_LE;
+		backup_fmt = format;
 	}
 	
 	//その以外の場合、エラーとします
-	else {
+	else 
+	{
 		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_BITS_PER_SAMPLE], wave_info->wave_header.bits_per_sample );
 		//fclose( wave_info->fp );
 		return ERR_BITS_PER_SAMPLE;
@@ -335,20 +343,26 @@ static int set_dsp(int *dsp, play_wave_info *wave_info)
 
 	int channel = ( int )wave_info->wave_header.num_channels;					//チャンネルを設定する
 
+	rate = wave_info->wave_header.sample_rate;
+	backup_rate = rate;
+	
 	//デバイスのフォーマットを設定する
-	if ( ioctl( *dsp, SNDCTL_DSP_SETFMT, &format ) == -1 ) {
+	if ( (ioctl( *dsp, SNDCTL_DSP_SETFMT, &format ) == -1) || (backup_fmt != format) ) 
+	{
 		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_SET_FMT] );
 		return ERR_SET_FMT;
 	}
 
 	//デバイスのサンプリングの周波数を設定
-	if ( ioctl( *dsp, SOUND_PCM_WRITE_RATE, &wave_info->wave_header.sample_rate ) == -1 ) {
+	if ( (ioctl( *dsp, SOUND_PCM_WRITE_RATE, &wave_info->wave_header.sample_rate ) == -1 ) || (backup_rate != rate) ) 
+	{
 		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_WRITE_RATE] );
 		return ERR_WRITE_RATE;
 	}
 
 	//デバイスのチャンネルを設定する
-	if ( ioctl( *dsp, SOUND_PCM_WRITE_CHANNELS, &channel ) == -1 ) {
+	if ( ioctl( *dsp, SOUND_PCM_WRITE_CHANNELS, &channel ) == -1 ) 
+	{
 		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_WRITE_CHANNEL] );
 		return ERR_WRITE_CHANNEL;
 	}
