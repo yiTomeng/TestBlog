@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 	}
 	*/
 	
-	if ( ERR_OK != play_wave(argv[1], refresh_times))
+	if ( -1 == play_wave(argv[1], refresh_times))
 	{
 		return -1;
 	}

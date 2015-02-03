@@ -15,6 +15,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <linux/soundcard.h>
+
 #include "sound_lib.h"
 
 #define HEADER_BUFSIZE		36												//ヘッダファイルのバッファサイズ
@@ -107,14 +108,14 @@ int play_wave(const char *filename, int refresh_times)
 	
 	
 	//音声ファイルを開く
-	if( (wave_info.fp = fopen(filename, "r")) == NULL )
+	if((wave_info.fp = fopen(filename, "r")) == NULL )
 	{
-		fprintf(stderr, "[%s:%d:%s()]%s:%s\n", __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_FILE_OPEN], filename);
-		return (int)ERR_FILE_OPEN;
+		fprintf(stderr, "Failed to open %s\n", filename);
+		return -1;
 	}
 	
 	//音声ファイルのヘッダを読み込む、チェック処理を行う
-	if ( ERR_OK != wave_read_file_header(&wave_info) )
+	if (-1 == wave_read_file_header(&wave_info))
 	{
 		fclose(wave_info.fp);
 		return -1;
@@ -123,33 +124,33 @@ int play_wave(const char *filename, int refresh_times)
 	//DSPデバイスを開く
 	if ( -1 == ( dsp = open( DSP_DEVICE, O_WRONLY ) ) ) 
 	{
-		fprintf(stderr, "[%s:%d:%s()]%s:%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_DEVICE_OPEN], DSP_DEVICE);
+		fprintf(stderr, "open()%s失敗しました。",  DSP_DEVICE);
 		fclose(wave_info.fp);
-		return ERR_DEVICE_OPEN;
+		return -1;
 	}
 	
 	//音声ファイルヘッダデータにより、DSPデバイスを設定する
-	if ( ERR_OK != set_dsp(&dsp, &wave_info))
+	if ( -1 == set_dsp(&dsp, &wave_info))
 	{
-		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_DEVICE_SET]);
+		perror("DSPデバイス設定失敗しました。");
 		close(dsp);
 		fclose(wave_info.fp);
-		return ERR_DEVICE_SET;
+		return -1;
 	}
 	
 	//放送を行う
-	if ( ERR_OK != dsp_play(&dsp, &wave_info) )
+	if (dsp_play(&dsp, &wave_info) < 0)
 	{
-		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_BROADCAST]);
+		perror("放送失敗しました。");
 		close(dsp);
 		fclose(wave_info.fp);
-		return ERR_BROADCAST;
+		return -1;
 	}
 	
 	close(dsp);
 	fclose(wave_info.fp);
 	
-	return ERR_OK;
+	return 0;
 }
 
 
@@ -211,50 +212,50 @@ static int wave_read_file_header(play_wave_info *wave_info)
 	{
 		if (feof(wave_info->fp))
 		{
-			fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_SIZE]);
-			return ERR_SIZE;
+			perror("ファイルサイズはヘッダサイズより小さい。");
+			return -1;
 		}
 		else
 		{
-			fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_FILE_READ]);
-			return ERR_FILE_READ;
+			perror("読み込み失敗。"):
+			return -1;
 		}
 	}
 	/*チェック処理を行う*/
 	//"RIFF"識別子をチェックする
 	if ( strncmp( wave_info->wave_header.chunk_id, "RIFF", 4 ) != 0 ) 
 	{
-		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_NOT_RIFF] );
-		return ERR_NOT_RIFF;
+		fprintf( stderr, "Specified file is not RIFF file.\n" );
+		return -1;
 	}
 	
 	//フォーマット"WAVE"をチェックする
 	if ( strncmp( wave_info->wave_header.format, "WAVE", 4 ) != 0 ) {
-		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_NOT_WAVE] );
-		return ERR_NOT_WAVE;
+		fprintf( stderr, "Specified file is not WAVE file.\n" );
+		return -1;
 	}
 
 	//"fmt"識別子をチェックする
 	if ( strncmp(wave_info->wave_header.sub_chunk_id, "fmt ", 4) != 0)
 	{
-		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_NOT_FIND_FMT_CHUNK] );
-		return ERR_NOT_FIND_FMT_CHUNK;
+		fprintf( stderr, "Failed to find fmt chunk.\n" );
+		return -1;
 	}
 	
 	//無限ループでデータ部を探す	
 	while ( 1 ) {
 		len = fread( buf, 8, 1, wave_info->fp );								//識別子とサイズを読み込む
-		if (len < 1)
+		if (len < 8)
 		{
 			if (feof(wave_info->fp))
 			{
-				fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_SIZE]);
-				return ERR_SIZE;
+				perror("ファイルサイズはヘッダサイズより小さい。");
+				return -1;
 			}
 			else
 			{
-				fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_FILE_READ]);
-				return ERR_FILE_READ;
+				perror("読み込み失敗。"):
+				return -1;
 			}
 		}
 		
@@ -266,8 +267,8 @@ static int wave_read_file_header(play_wave_info *wave_info)
 			//位置lenバイト後を設定し、"data"を探し続く
 			if ( fseek( wave_info->fp, len, SEEK_CUR ) == -1 ) 
 			{
-				fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_NOT_FIND_DATA_CHUNK] );
-				return ERR_NOT_FIND_DATA_CHUNK;
+				fprintf( stderr, "Failed to find data chunk.\n" );
+				return -1;
 			}
 		}
 		else 
@@ -282,11 +283,11 @@ static int wave_read_file_header(play_wave_info *wave_info)
 	//データの開始位置を保存しながら、チェックします
 	if ( ( wave_info->play_start_pos = ftell( wave_info->fp ) ) == -1 ) 
 	{
-		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_NOT_FIND_DATA] );
-		return ERR_NOT_FIND_DATA;
+		fprintf( stderr, "Failed to find offset of PCM data.\n" );
+		return -1;
 	}
 	
-	return ERR_OK;
+	return 0;
 }
 
 
@@ -310,9 +311,9 @@ static int set_dsp(int *dsp, play_wave_info *wave_info)
 	//メディアフォーマットは"1"でなければ、PCMフォーマットではないと判断します。(この状態は別の圧縮ファイルになってしまう)
 	if ( 1 != wave_info->wave_header.audio_format)
 	{
-		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_NOT_PCM] );
+		fprintf( stderr, "Specified file's sound data is not PCM format.\n" );
 		//fclose( wave_info->fp );
-		return ERR_NOT_PCM;
+		return -1;
 	}
 	
 	//量子化ビット数をチェックする
@@ -328,32 +329,33 @@ static int set_dsp(int *dsp, play_wave_info *wave_info)
 	
 	//その以外の場合、エラーとします
 	else {
-		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_BITS_PER_SAMPLE], wave_info->wave_header.bits_per_sample );
+		fprintf( stderr, "Specified file's sound data is %d bits,"
+			 "not 8 nor 16 bits.\n", wave_info->wave_header.bits_per_sample );
 		//fclose( wave_info->fp );
-		return ERR_BITS_PER_SAMPLE;
+		return -1;
 	}
 
 	int channel = ( int )wave_info->wave_header.num_channels;					//チャンネルを設定する
 
 	//デバイスのフォーマットを設定する
 	if ( ioctl( *dsp, SNDCTL_DSP_SETFMT, &format ) == -1 ) {
-		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_SET_FMT] );
-		return ERR_SET_FMT;
+		perror( "ioctl( SOUND_PCM_SETFMT )" );
+		return -1;
 	}
 
 	//デバイスのサンプリングの周波数を設定
 	if ( ioctl( *dsp, SOUND_PCM_WRITE_RATE, &wave_info->wave_header.sample_rate ) == -1 ) {
-		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_WRITE_RATE] );
-		return ERR_WRITE_RATE;
+		perror( "ioctl( SOUND_PCM_WRITE_RATE )" );
+		return -1;
 	}
 
 	//デバイスのチャンネルを設定する
 	if ( ioctl( *dsp, SOUND_PCM_WRITE_CHANNELS, &channel ) == -1 ) {
-		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_WRITE_CHANNEL] );
-		return ERR_WRITE_CHANNEL;
+		perror( "ioctl( SOUND_PCM_WRITE_CHANNELS )" );
+		return -1;
 	}
 
-	return ERR_OK ;
+	return 0;
 }
 
 
@@ -376,7 +378,7 @@ static int dsp_play(int *dsp, play_wave_info *wave_info)
 	int len;								//臨時変数サイズ
 	char buf[BUFSIZE];						//臨時バッファ(ファイル読み込むとデバイスに書き込む用)
 	int rebroadcast_cnt = 0;				//再生回数
-	int ret = ERR_OK;						//リータン値
+	int ret = 0;							//リータン値
 	
 	printf( "Now playing specified wave file %s ...\n", wave_info->play_filename );
 	fflush( stdout );
@@ -397,8 +399,8 @@ static int dsp_play(int *dsp, play_wave_info *wave_info)
 				//書込み失敗
 				if ( -1 == write( *dsp, buf, len ) ) 
 				{
-					fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_DEVICE_WRITE] );
-					ret = ERR_DEVICE_WRITE;
+					perror( "[EOF]DSPデバイスに書き込むことが失敗しました。" );
+					ret = -1;
 				}
 				//正常の場合、再生回数により、終了するかもう一度再生するかを決める
 				else 
@@ -412,8 +414,8 @@ static int dsp_play(int *dsp, play_wave_info *wave_info)
 			}
 			else 
 			{
-				fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_BROADCAST] );
-				ret = ERR_BROADCAST;
+				perror( "放送中読み込み失敗。" );
+				ret = -1;
 			}
 
 			break;
@@ -421,8 +423,8 @@ static int dsp_play(int *dsp, play_wave_info *wave_info)
 
 		if ( -1 == write( *dsp, buf, len ) ) 
 		{
-			fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_DEVICE_WRITE] );
-			ret = ERR_DEVICE_WRITE;
+			perror( "DSPデバイスに書き込むことが失敗しました。" );
+			ret = -1;
 			break;
 		}
 
