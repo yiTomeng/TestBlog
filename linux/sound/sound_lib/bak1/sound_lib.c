@@ -5,8 +5,7 @@
  * REMARKS      :
  * HISTORY      :
  * ID-----------DATE--------NAME----------NOTE --------------------------------
- * [V01.00.00]  2015.2.2   晏       初期作成
- * [V01.00.01]  2015.2.6   晏        
+ * [V01.00.00]  2015.2.2    晏       初期作成
  *****************************************************************************/
 
 #include <fcntl.h> 
@@ -18,7 +17,7 @@
 #include <linux/soundcard.h>
 #include "sound_lib.h"
 
-//#define HEADER_BUFSIZE		36												//ヘッダファイルのバッファサイズ
+#define HEADER_BUFSIZE		36												//ヘッダファイルのバッファサイズ
 #define BUFSIZE				64000											//ファイル読み込む用バッファサイズ
 #define ERR_MSG_SIZE		64
 //#define FILENAME_SIZE		32												//ファイル名バッファサイズ
@@ -55,7 +54,7 @@ typedef struct
 
 
 static const char err_msg[][ERR_MSG_SIZE] = {
-	[ERR_ZERO] 					= "エラー無し。",
+	[ERR_OK] 					= "エラー無し。",
 	[ERR_FILE_OPEN] 			= "ファイルopen失敗しました。",
 	[ERR_FILE_READ] 			= "ファイルの読み込みは失敗しました。",
 	[ERR_FILE_WRITE] 			= "",
@@ -63,7 +62,6 @@ static const char err_msg[][ERR_MSG_SIZE] = {
 	[ERR_DEVICE_READ] 			= "",
 	[ERR_DEVICE_WRITE] 			= "DSPデバイスに書き込むことが失敗しました。",
 	[ERR_DEVICE_SET] 			= "DSPデバイス設定失敗しました。",
-	[ERR_DEVICE_DESCRIPTOR]		= "ファイル識別子異常",
 	[ERR_BROADCAST] 			= "放送失敗しました。",
 	[ERR_SIZE] 					= "ファイルサイズはヘッダサイズより小さい。",
 	[ERR_NOT_RIFF] 				= "Specified file is not RIFF file.\n",
@@ -78,78 +76,30 @@ static const char err_msg[][ERR_MSG_SIZE] = {
 	[ERR_WRITE_CHANNEL] 		= "ioctl( SOUND_PCM_WRITE_CHANNELS )"
 };
 
-
 static void wave_init(const char *filename, play_wave_info *wave_info, int refresh_count);		//WAVファイルインフォーメーション初期化
 static int wave_read_file_header(play_wave_info *wave_info);									//WAVファイルヘッダを読み込む
 static int set_dsp(int *dsp, play_wave_info *wave_info);										//DSPデバイスを設定
-static int dsp_play(int *dsp, int *stop_cmd, play_wave_info *wave_info);						//放送
+static int dsp_play(int *dsp, play_wave_info *wave_info);										//放送
 
 
-/*SOH*************************************************************************
- * NAME         : open_voice_device
- * FUNCTION     : デバイスを開く
- * VERSION      : 01.00.00
- * IN/OUT       : (i/o) dsp: 音声放送デバイスの識別子
- * RETURN       : 0:OK >0:NG　
- * REMARKS      : 備考
- * HISTORY      :
- * ID-----------DATE--------NAME----------NOTE --------------------------------
- * [V01.00.00]  2015.02.06  晏         
- *************************************************************************EOH*/
-int open_voice_device(int *dsp)							
-{
-	if ( -1 == ( *dsp = open( DSP_DEVICE, O_WRONLY ) ) ) 
-	{
-		fprintf(stderr, "[%s:%d:%s()]%s:%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_DEVICE_OPEN], DSP_DEVICE);
-		return ERR_DEVICE_OPEN;
-	}
-	return ERR_ZERO;
-}
 
 /*SOH*************************************************************************
- * NAME         : close_voice_device
- * FUNCTION     : デバイスをクロス
- * VERSION      : 01.00.00
- * IN/OUT       : (i/o) dsp: 音声放送デバイスの識別子
- * RETURN       : 0:OK >0:NG　
- * REMARKS      : 備考
- * HISTORY      :
- * ID-----------DATE--------NAME----------NOTE --------------------------------
- * [V01.00.00]  2015.02.06  晏         
- *************************************************************************EOH*/
-int close_voice_device(int *dsp)										
-{
-	if (*dsp <= 0)
-	{
-		fprintf(stderr, "[%s:%d:%s()]%s:%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_DEVICE_DESCRIPTOR], DSP_DEVICE);
-		return ERR_DEVICE_DESCRIPTOR;
-	}
-	
-	close(*dsp);
-	
-	return ERR_ZERO;
-}
-
-/*SOH*************************************************************************
- * NAME         : start_play_wave
+ * NAME         : play_wave
  * FUNCTION     : WAVファイル放送インターフェス
  * VERSION      : 01.00.00
- * IN/OUT       : (i/ ) dsp				: 音声放送デバイスの識別子
- *				: (i/ ) filename		: 音声ファイル名
- *              : (i/ ) refresh_times 	: 再生回数
- *				: (i/ ) play_status		: 再生状態
- * RETURN       : 0:OK >0:NG　
+ * IN/OUT       : (i/ ) filename: 音声ファイル名
+ *              : (i/ ) refresh_times : 再生回数
+ * RETURN       : 0:OK <0:NG　
  * REMARKS      : 備考
  * HISTORY      :
  * ID-----------DATE--------NAME----------NOTE --------------------------------
- * [V01.00.00]  2015.02.02  晏         
- * [V01.00.01]  2015.02.06  晏         
+ * [V01.00.00]  2015.02.02  晏      
  *************************************************************************EOH*/
 
-int start_play_wave(int *dsp, const char *filename, int refresh_times, play_stat *play_status)
+int play_wave(const char *filename, int refresh_times)
 {
 	
-//	int dsp = 0;						//DSPデバイスの識別子
+	int dsp = 0;						//DSPデバイスの識別子
 		
 	play_wave_info wave_info;			//音声ファイルインフォーメーション
 	
@@ -164,12 +114,12 @@ int start_play_wave(int *dsp, const char *filename, int refresh_times, play_stat
 	}
 	
 	//音声ファイルのヘッダを読み込む、チェック処理を行う
-	if ( ERR_ZERO != wave_read_file_header(&wave_info) )
+	if ( ERR_OK != wave_read_file_header(&wave_info) )
 	{
 		fclose(wave_info.fp);
 		return -1;
 	}
-#if 0		//もう一つ関数に移動
+	
 	//DSPデバイスを開く
 	if ( -1 == ( dsp = open( DSP_DEVICE, O_WRONLY ) ) ) 
 	{
@@ -177,53 +127,30 @@ int start_play_wave(int *dsp, const char *filename, int refresh_times, play_stat
 		fclose(wave_info.fp);
 		return ERR_DEVICE_OPEN;
 	}
-#endif	
+	
 	//音声ファイルヘッダデータにより、DSPデバイスを設定する
-	if ( ERR_ZERO != set_dsp(dsp, &wave_info) )
+	if ( ERR_OK != set_dsp(&dsp, &wave_info))
 	{
 		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_DEVICE_SET]);
-//		close(dsp);
+		close(dsp);
 		fclose(wave_info.fp);
 		return ERR_DEVICE_SET;
 	}
 	
 	//放送を行う
-	if ( ERR_ZERO != dsp_play(dsp, &play_status->stop_cmd, &wave_info) )
+	if ( ERR_OK != dsp_play(&dsp, &wave_info) )
 	{
 		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_BROADCAST]);
-//		close(dsp);
+		close(dsp);
 		fclose(wave_info.fp);
 		return ERR_BROADCAST;
 	}
 	
-//	close(dsp);
+	close(dsp);
 	fclose(wave_info.fp);
 	
-	return ERR_ZERO;
+	return ERR_OK;
 }
-
-/*SOH*************************************************************************
- * NAME         : stop_play_wave
- * FUNCTION     : WAVファイル放送ストップインターフェス
- * VERSION      : 01.00.00
- * IN/OUT       : 
- * RETURN       : 0:OK >0:NG　
- * REMARKS      : 備考
- * HISTORY      :
- * ID-----------DATE--------NAME----------NOTE --------------------------------
- * [V01.00.00]  2015.02.06  晏         
- *************************************************************************EOH*/
-void stop_play_wave(play_stat *play_status)
-{
-	if (IS_RUNNING == play_status->status)
-	{
-		play_status->stop_cmd = STOP_PLAY;					//放送をストップフラグを設定する
-	}
-	else
-	{
-		fprintf(stderr, "[%s:%d:%s()]音声を再生していません。",  __FILE__, __LINE__, __FUNCTION__);
-	}
-}														
 
 
 /*SOH*************************************************************************
@@ -233,7 +160,7 @@ void stop_play_wave(play_stat *play_status)
  * IN/OUT       : (i/ ) filename: ファイル名
  *              : (i/o) wave_info : 音声ファイルインフォーメーション
  			    : (i/ )refresh_count:再生回数
- * RETURN       : 0:OK >0:NG　
+ * RETURN       : 0:OK <0:NG　
  * REMARKS      : 備考
  * HISTORY      :
  * ID-----------DATE--------NAME----------NOTE --------------------------------
@@ -257,7 +184,7 @@ static void wave_init(const char *filename, play_wave_info *wave_info, int refre
  * FUNCTION     : 音声ファイルヘッダデータを読み込んで、チェックします
  * VERSION      : 01.00.00
  * IN/OUT       : (i/o) wave_info: 音声ファイルインフォーメーション　　
- * RETURN       : 0:OK >0:NG　
+ * RETURN       : 0:OK <0:NG　
  * REMARKS      : 備考
  * HISTORY      :
  * ID-----------DATE--------NAME----------NOTE --------------------------------
@@ -267,9 +194,9 @@ static void wave_init(const char *filename, play_wave_info *wave_info, int refre
 static int wave_read_file_header(play_wave_info *wave_info)
 {
 	int len = 0;							//臨時変数　サイズ
-	char buf[BUFSIZE];						//臨時バッファ
+	char buf[HEADER_BUFSIZE];				//臨時バッファ
 	
-	memset(buf, 0x00, BUFSIZE);				//臨時バッファを初期化する
+	memset(buf, 0x00, HEADER_BUFSIZE);		//臨時バッファを初期化する
 	
 	//ファイルヘッダをバッファに読み込む
 	//fread( buf, 1, HEADER_BUFSIZE, wave_info->fp );
@@ -278,9 +205,9 @@ static int wave_read_file_header(play_wave_info *wave_info)
 	//memcpy(&wave_info->wave_header, buf, HEADER_BUFSIZE);
 	
 	//ファイルヘッダをバッファに読み込む
-	len = fread( &wave_info->wave_header, 1, sizeof(wave_file_header_info), wave_info->fp );
+	len = fread( &wave_info->wave_header, 1, HEADER_BUFSIZE, wave_info->fp );
 	
-	if (len < sizeof(wave_file_header_info))
+	if (len < HEADER_BUFSIZE)
 	{
 		if (feof(wave_info->fp))
 		{
@@ -359,7 +286,7 @@ static int wave_read_file_header(play_wave_info *wave_info)
 		return ERR_NOT_FIND_DATA;
 	}
 	
-	return ERR_ZERO;
+	return ERR_OK;
 }
 
 
@@ -369,7 +296,7 @@ static int wave_read_file_header(play_wave_info *wave_info)
  * VERSION      : 01.00.00
  * IN/OUT       : (i/ ) dsp: DSPデバイスの識別子
  *              : (i/ ) wave_info : 音声ファイルインフォーメーション
- * RETURN       : 0:OK >0:NG　
+ * RETURN       : 0:OK <0:NG　
  * REMARKS      : 備考
  * HISTORY      :
  * ID-----------DATE--------NAME----------NOTE --------------------------------
@@ -420,6 +347,9 @@ static int set_dsp(int *dsp, play_wave_info *wave_info)
 	backup_rate = rate;
 	
 	//デバイスのフォーマットを設定する
+	//デバイスのフォーマットを設定するとき(ioctlを使うとき)、
+	//サポートされない時に、エラーなしで他のサポートできるフォーマットを引数に格納し、採用することもあるので、
+	//ioctlを呼び出した後、引数のフォーマットをチェックしないといけないのです。
 	if ( (ioctl( *dsp, SNDCTL_DSP_SETFMT, &format ) == -1) || (backup_fmt != format) ) 
 	{
 		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_SET_FMT] );
@@ -427,6 +357,9 @@ static int set_dsp(int *dsp, play_wave_info *wave_info)
 	}
 
 	//デバイスのサンプリングの周波数を設定
+	//デバイスの周波数を設定するとき(ioctlを使うとき)、
+	//サポートされない時に、エラーなしで他のサポートできる周波数(もっとも近く周波数)を引数に格納し、採用することもあるので、
+	//ioctlを呼び出した後、引数の周波数をチェックしないといけないのです。
 	if ( (ioctl( *dsp, SOUND_PCM_WRITE_RATE, &wave_info->wave_header.sample_rate ) == -1 ) || (backup_rate != rate) ) 
 	{
 		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_WRITE_RATE] );
@@ -440,7 +373,7 @@ static int set_dsp(int *dsp, play_wave_info *wave_info)
 		return ERR_WRITE_CHANNEL;
 	}
 
-	return ERR_ZERO ;
+	return ERR_OK ;
 }
 
 
@@ -449,23 +382,21 @@ static int set_dsp(int *dsp, play_wave_info *wave_info)
  * NAME         : dsp_play　　
  * FUNCTION     : 音声を放送する
  * VERSION      : 01.00.00
- * IN/OUT       : (i/ ) dsp			: DSPデバイスの識別子
- *				: (i/ ) stop_cmd	: 再生を中止する識別子
- *              : (i/ ) wave_info 	: 音声ファイルインフォーメーション
- * RETURN       : 0:OK >0:NG　
+ * IN/OUT       : (i/ ) dsp: DSPデバイスの識別子
+ *              : (i/ ) wave_info : 音声ファイルインフォーメーション
+ * RETURN       : 0:OK <0:NG　
  * REMARKS      : 備考
  * HISTORY      :
  * ID-----------DATE--------NAME----------NOTE --------------------------------
  * [V01.00.00]  2015.02.02  晏         
- * [V01.00.01]  2015.02.06  晏         
   *************************************************************************EOH*/
 
-static int dsp_play(int *dsp, int *stop_cmd, play_wave_info *wave_info)
+static int dsp_play(int *dsp, play_wave_info *wave_info)
 {
 	int len;								//臨時変数サイズ
 	char buf[BUFSIZE];						//臨時バッファ(ファイル読み込むとデバイスに書き込む用)
 	int rebroadcast_cnt = 0;				//再生回数
-	int ret = ERR_ZERO;						//リータン値
+	int ret = ERR_OK;						//リータン値
 	
 	printf( "Now playing specified wave file %s ...\n", wave_info->play_filename );
 	fflush( stdout );
@@ -475,13 +406,6 @@ static int dsp_play(int *dsp, int *stop_cmd, play_wave_info *wave_info)
 
 	//ループで再生する
 	while ( 1 ) {
-		
-		if ( STOP_PLAY == *stop_cmd )
-		{
-			fprintf(stderr, "[%s:%d:%s()]中止指示があるため、中止する。",  __FILE__, __LINE__, __FUNCTION__);
-			break;
-		}
-		
 		len = fread( buf, 1, BUFSIZE, wave_info->fp );
 
 		//ファイルを再生完了場合や読み込み失敗の場合
