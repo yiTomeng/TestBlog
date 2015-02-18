@@ -4,7 +4,7 @@
 #include "sound_lib.h"
 			
 
-#define ERR_MSG_SIZE		128												//エラーメッセージサイズ
+#define ERR_MSG_SIZE		64												//エラーメッセージサイズ
 #define BUFSIZE				64000											//バッファサイズ
 #define MIXER_MASTER_NAME	"Master"										//音声項目Master
 #define MIXER_PCM_NAME		"PCM"											//音声項目PCM
@@ -13,76 +13,61 @@
 #define FORMAT_S16_LE		16												//16位量子化数
 #define PLAY_FINAL_CHUNK	1												//最後かどうかのフラグ
 
-
 #define DEF_ERR(_code, _str) [_code] = (_str)
 
 
 //エラーメッセージ
 static const char err_msg[][ERR_MSG_SIZE] = {
-	/* エラー無し */
-	DEF_ERR(ERR_ZERO, 										ERR_STR_ZERO),
-	/* ファイル　エラー */
-	DEF_ERR(ERR_FILE_OPEN, 									ERR_STR_FILE_OPEN),		
-	DEF_ERR(ERR_FILE_READ, 									ERR_STR_FILE_READ),		
-	DEF_ERR(ERR_FILE_WRITE, 								ERR_STR_FILE_WRITE),		
-	DEF_ERR(ERR_FILE_HEADER_READ,							ERR_STR_FILE_HEADER_READ),
-	/* デバイス　エラー */
-	DEF_ERR(ERR_DEVICE_OPEN, 								ERR_STR_DEVICE_OPEN),	
-	DEF_ERR(ERR_DEVICE_CLOSE, 								ERR_STR_DEVICE_CLOSE),			
-	DEF_ERR(ERR_DEVICE_READ, 								ERR_STR_DEVICE_READ),		
-	DEF_ERR(ERR_DEVICE_WRITE, 								ERR_STR_DEVICE_WRITE),		
-	DEF_ERR(ERR_DEVICE_SET, 								ERR_STR_DEVICE_SET),		
-	DEF_ERR(ERR_DEVICE_DESCRIPTOR,							ERR_STR_DEVICE_DESCRIPTOR),
-	/* その他 */
-	DEF_ERR(ERR_BROADCAST, 									ERR_STR_BROADCAST),		
-	DEF_ERR(ERR_SIZE, 										ERR_STR_SIZE),	
-	DEF_ERR(ERR_HANDLE_NULL, 								ERR_STR_HANDLE_NULL),
-	DEF_ERR(ERR_HANDLE_NOT_NULL, 							ERR_STR_HANDLE_NOT_NULL),
-	DEF_ERR(ERR_PLAYBACK_NO_FRAME, 							ERR_STR_PLAYBACK_NO_FRAME),
-	
-	/* WAVファイル　エラー */			
-	DEF_ERR(ERR_NOT_RIFF, 									ERR_STR_NOT_RIFF),			
-	DEF_ERR(ERR_NOT_WAVE, 									ERR_STR_NOT_WAVE),			
-	DEF_ERR(ERR_NOT_FIND_FMT_CHUNK, 						ERR_STR_NOT_FIND_FMT_CHUNK),
-	DEF_ERR(ERR_NOT_FIND_DATA_CHUNK, 						ERR_STR_NOT_FIND_DATA_CHUNK),
-	DEF_ERR(ERR_NOT_FIND_DATA,								ERR_STR_NOT_FIND_DATA),
-	DEF_ERR(ERR_NOT_PCM, 									ERR_STR_NOT_PCM),	
-	/*  */		
-	DEF_ERR(ERR_BITS_PER_SAMPLE, 							ERR_STR_BITS_PER_SAMPLE),	
-	DEF_ERR(ERR_SET_FMT, 									ERR_STR_SET_FMT),			
-	DEF_ERR(ERR_WRITE_RATE, 								ERR_STR_WRITE_RATE),		
-	DEF_ERR(ERR_WRITE_CHANNEL,								ERR_STR_WRITE_CHANNEL), 
-	
-	/* 音声デバイス設定　エラー */
-	DEF_ERR(ERR_ALSA_UnableToGetInitialParameters,			ERR_STR_ALSA_UnableToGetInitialParameters	),
-	DEF_ERR(ERR_ALSA_UnableToSetAccessType,					ERR_STR_ALSA_UnableToSetAccessType			),
-	DEF_ERR(ERR_ALSA_formatNotSupportedByHardware,			ERR_STR_ALSA_formatNotSupportedByHardware	),
-	DEF_ERR(ERR_ALSA_UnableToSetFormat,						ERR_STR_ALSA_UnableToSetFormat				),
-	DEF_ERR(ERR_ALSA_UnableToSetChannels,					ERR_STR_ALSA_UnableToSetChannels			),
-	DEF_ERR(ERR_ALSA_UnableToDisableResampling,				ERR_STR_ALSA_UnableToDisableResampling		),
-	DEF_ERR(ERR_ALSA_UnableToSetSamplerate2,				ERR_STR_ALSA_UnableToSetSamplerate2			),
-	DEF_ERR(ERR_ALSA_UnableToSetBufferTimeNear,				ERR_STR_ALSA_UnableToSetBufferTimeNear		),
-	DEF_ERR(ERR_ALSA_UnableToSetHwParameters,				ERR_STR_ALSA_UnableToSetHwParameters		),
-	DEF_ERR(ERR_ALSA_UnableToGetBufferSize,					ERR_STR_ALSA_UnableToGetBufferSize			),
-	DEF_ERR(ERR_ALSA_UnableToGetPeriodSize,					ERR_STR_ALSA_UnableToGetPeriodSize			),
-	DEF_ERR(ERR_ALSA_UnableToGetBoundary,					ERR_STR_ALSA_UnableToGetBoundary			),
-	DEF_ERR(ERR_ALSA_UnableToSetStartThreshold,				ERR_STR_ALSA_UnableToSetStartThreshold		),
-	DEF_ERR(ERR_ALSA_UnableToSetStopThreshold,				ERR_STR_ALSA_UnableToSetStopThreshold		),
-	DEF_ERR(ERR_ALSA_UnableToSetSilenceSize,				ERR_STR_ALSA_UnableToSetSilenceSize			),
-	DEF_ERR(ERR_ALSA_UnableToGetSwParameters,				ERR_STR_ALSA_UnableToGetSwParameters		),
-	DEF_ERR(ERR_ALSA_UnableToFindSimpleControl,				ERR_STR_ALSA_UnableToFindSimpleControl		),
-	DEF_ERR(ERR_ALSA_UnableToSetPeriods,					ERR_STR_ALSA_UnableToSetPeriods				),
-	DEF_ERR(ERR_ALSA_PcmInSuspendModeTryingResume,			ERR_STR_ALSA_PcmInSuspendModeTryingResume	),
-	DEF_ERR(ERR_ALSA_TryingToResetSoundcard,				ERR_STR_ALSA_TryingToResetSoundcard			),
-	DEF_ERR(ERR_ALSA_PcmPrepareError,						ERR_STR_ALSA_PcmPrepareError				),
-	/* ミキサー設定　エラー */
-	DEF_ERR(ERR_ALSA_MixerOpenError, 						ERR_STR_ALSA_MixerOpenError					),
-	DEF_ERR(ERR_ALSA_MixerAttachError, 						ERR_STR_ALSA_MixerAttachError				),
-	DEF_ERR(ERR_ALSA_MixerRegisterError,					ERR_STR_ALSA_MixerRegisterError				),
-	DEF_ERR(ERR_ALSA_MixerLoadError,						ERR_STR_ALSA_MixerLoadError					),
-	DEF_ERR(ERR_ALSA_MixerSetVolumeError,					ERR_STR_ALSA_MixerSetVolumeError			)
-	
-};                                                          
+	DEF_ERR(ERR_ZERO, 					ERR_STR_ZERO),
+	DEF_ERR(ERR_FILE_OPEN, 				ERR_STR_FILE_OPEN),		
+	DEF_ERR(ERR_FILE_READ, 				ERR_STR_FILE_READ),		
+	DEF_ERR(ERR_FILE_WRITE, 			ERR_STR_FILE_WRITE),		
+	DEF_ERR(ERR_FILE_HEADER_READ,		ERR_STR_FILE_HEADER_READ),
+	DEF_ERR(ERR_DEVICE_OPEN, 			ERR_STR_DEVICE_OPEN),	
+	DEF_ERR(ERR_DEVICE_CLOSE, 			ERR_STR_DEVICE_CLOSE),			
+	DEF_ERR(ERR_DEVICE_READ, 			ERR_STR_DEVICE_READ),		
+	DEF_ERR(ERR_DEVICE_WRITE, 			ERR_STR_DEVICE_WRITE),		
+	DEF_ERR(ERR_DEVICE_SET, 			ERR_STR_DEVICE_SET),		
+	DEF_ERR(ERR_DEVICE_DESCRIPTOR,		ERR_STR_DEVICE_DESCRIPTOR),
+	DEF_ERR(ERR_BROADCAST, 				ERR_STR_BROADCAST),		
+	DEF_ERR(ERR_SIZE, 					ERR_STR_SIZE),				
+	DEF_ERR(ERR_NOT_RIFF, 				ERR_STR_NOT_RIFF),			
+	DEF_ERR(ERR_NOT_WAVE, 				ERR_STR_NOT_WAVE),			
+	DEF_ERR(ERR_NOT_FIND_FMT_CHUNK, 	ERR_STR_NOT_FIND_FMT_CHUNK),
+	DEF_ERR(ERR_NOT_FIND_DATA_CHUNK, 	ERR_STR_NOT_FIND_DATA_CHUNK),
+	DEF_ERR(ERR_NOT_FIND_DATA,			ERR_STR_NOT_FIND_DATA),
+	DEF_ERR(ERR_NOT_PCM, 				ERR_STR_NOT_PCM),			
+	DEF_ERR(ERR_BITS_PER_SAMPLE, 		ERR_STR_BITS_PER_SAMPLE),	
+	DEF_ERR(ERR_SET_FMT, 				ERR_STR_SET_FMT),			
+	DEF_ERR(ERR_WRITE_RATE, 			ERR_STR_WRITE_RATE),		
+	DEF_ERR(ERR_WRITE_CHANNEL,			ERR_STR_WRITE_CHANNEL)
+};
+
+
+static enum alsa_err_def
+{
+	ALSA_UnableToGetInitialParameters,
+	ALSA_UnableToSetAccessType,
+	ALSA_formatNotSupportedByHardware,
+	ALSA_UnableToSetFormat,
+	ALSA_UnableToSetChannels,
+	ALSA_UnableToDisableResampling,
+	ALSA_UnableToSetSamplerate2,
+	ALSA_UnableToSetBufferTimeNear,
+	ALSA_UnableToSetHwParameters,
+	ALSA_UnableToGetBufferSize,
+	ALSA_UnableToGetPeriodSize,
+	ALSA_UnableToGetBoundary,
+	ALSA_UnableToSetStartThreshold,
+	ALSA_UnableToSetStopThreshold,
+	ALSA_UnableToSetSilenceSize,
+	ALSA_UnableToGetSwParameters,
+	ALSA_MixerAttachError,
+	ALSA_MixerRegisterError,
+	ALSA_MixerLoadError,
+	ALSA_UnableToFindSimpleControl,
+	ALSA_UnableToSetPeriods
+}alsa_err;
 
 
 
@@ -116,14 +101,11 @@ typedef struct
 }play_wave_info;
 
 
-static snd_pcm_uframes_t sl_buffersize = 0; 								//バッファサイズ
-static snd_pcm_uframes_t sl_outburst = 0; 									//1 periodのサイズ
-static size_t bytes_per_sample = 0;											//1 sampleのサイズ
-
-
-static int init(snd_pcm_t *handle, play_wave_info *wave_info);
-static int wave_read_file_header(play_wave_info *wave_info);
+static snd_pcm_uframes_t sl_buffersize = 0; 
+static snd_pcm_uframes_t sl_outburst = 0; 
+static size_t bytes_per_sample = 0;
 static int set_volumn(const char *mixer_name, long left_vol, long right_vol);
+static int init(snd_pcm_t *handle, play_wave_info *wave_info);
 static int play(snd_pcm_t *handler, void* data, int len, int flags);
 				    
 int open_device(snd_pcm_t **handle)
@@ -133,8 +115,8 @@ int open_device(snd_pcm_t **handle)
 	//assert(*handle == NULL);
 	if (NULL != *handle)
 	{
-		printf("[%s_%s_%d]%s", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_HANDLE_NOT_NULL]);
-		return ERR_HANDLE_NOT_NULL;
+		printf("[%s_%s_%d]%s", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_DEVICE_OPEN]);
+		return ERR_DEVICE_OPEN;
 	}
 	if ((err = snd_pcm_open(handle, DEVICE, SND_PCM_STREAM_PLAYBACK, 0)) < 0)
 	{
@@ -144,8 +126,8 @@ int open_device(snd_pcm_t **handle)
 	
 	if (NULL == *handle)
 	{
-		printf("[%s_%s_%d]%s", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_HANDLE_NULL]);
-		return ERR_HANDLE_NULL;
+		printf("[%s_%s_%d]%s", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_DEVICE_OPEN]);
+		return ERR_DEVICE_OPEN;
 	}
 	
 	return ERR_ZERO;
@@ -155,10 +137,11 @@ int close_device(snd_pcm_t *handle)
 {
 	int err = ERR_ZERO;
 	
+	//assert(handle != NULL);
 	if (NULL == handle)
 	{
-		printf("[%s_%s_%d]%s", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_HANDLE_NULL]);
-		return ERR_HANDLE_NULL;
+		printf("[%s_%s_%d]%s", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_DEVICE_CLOSE]);
+		return ERR_DEVICE_CLOSE;
 	}
 	if ((err = snd_pcm_close(handle)) < 0)
 	{
@@ -211,8 +194,8 @@ static int init(snd_pcm_t *handle, play_wave_info *wave_info)
     snd_pcm_uframes_t boundary;
    
 	assert(handle != NULL);
-	assert(wave_info != NULL);
-    
+	
+    //handle = NULL;
 #if SND_LIB_VERSION >= 0x010005
     printf("alsa-init: using ALSA %s\n", snd_asoundlib_version());
 #else
@@ -247,37 +230,39 @@ static int init(snd_pcm_t *handle, play_wave_info *wave_info)
     // setting hw-parameters
     if ((err = snd_pcm_hw_params_any(handle, alsa_hwparams)) < 0)
 	{
-		printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_UnableToGetInitialParameters], snd_strerror(err));
-	  	return ERR_ALSA_UnableToGetInitialParameters;
+		printf("%d:%s\n", ALSA_UnableToGetInitialParameters, snd_strerror(err));
+	  	return 0;
 	}
 
 	
     err = snd_pcm_hw_params_set_access(handle, alsa_hwparams, SND_PCM_ACCESS_RW_INTERLEAVED);
     if (err < 0) 
     {
-		printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_UnableToSetAccessType],
+		printf("%d:%s\n", ALSA_UnableToSetAccessType,
 		       snd_strerror(err));
-		return ERR_ALSA_UnableToSetAccessType;
+		return 0;
     }
 
       /* workaround for nonsupported formats
 	 sets default format to S16_LE if the given formats aren't supported */
 	if ((err = snd_pcm_hw_params_test_format(handle, alsa_hwparams, format)) < 0)
 	{
-		printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_formatNotSupportedByHardware], (format));
+		printf("%d:%d\n", ALSA_formatNotSupportedByHardware, (format));
         format = SND_PCM_FORMAT_S16_LE;
 	}
 
 	if ((err = snd_pcm_hw_params_set_format(handle, alsa_hwparams, format)) < 0)
 	{
-		printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_UnableToSetFormat], snd_strerror(err));
-		return ERR_ALSA_UnableToSetFormat;
+		printf("%d:%s\n",ALSA_UnableToSetFormat,
+		snd_strerror(err));
+		return 0;
 	}
 
 	if ((err = snd_pcm_hw_params_set_channels_near(handle, alsa_hwparams, &channel)) < 0)
 	{
-		printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_UnableToSetChannels], snd_strerror(err));
-		return ERR_ALSA_UnableToSetChannels;
+		printf("%d:%s\n", ALSA_UnableToSetChannels,
+		snd_strerror(err));
+		return 0;
 	}
 
       /* workaround for buggy rate plugin (should be fixed in ALSA 1.0.11)
@@ -290,40 +275,50 @@ static int init(snd_pcm_t *handle, play_wave_info *wave_info)
 	
     if ((err = snd_pcm_hw_params_set_rate_resample(handle, alsa_hwparams, 0)) < 0)
 	{
-		printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_UnableToDisableResampling], snd_strerror(err));
-	  return ERR_ALSA_UnableToDisableResampling;
+		printf("%d:%s\n",ALSA_UnableToDisableResampling,
+		snd_strerror(err));
+	  return 0;
 	}
 	
 	printf("rate after1:%d\n", rate);
 	#endif
 #endif
 /**/
-    if ((err = snd_pcm_hw_params_set_rate_near(handle, alsa_hwparams, &rate, NULL)) < 0)
+    if ((err = snd_pcm_hw_params_set_rate_near(handle, alsa_hwparams,
+ 							&rate, NULL)) < 0)
+//    if ((err = snd_pcm_hw_params_set_rate(handle, alsa_hwparams,
+//						 rate, 0)) < 0)
     {
-		 printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_UnableToSetSamplerate2], snd_strerror(err));
-		 return ERR_ALSA_UnableToSetSamplerate2;
+		 printf("%d:%s\n", ALSA_UnableToSetSamplerate2,
+		 snd_strerror(err));
+		 return 0;
     }
     
     bytes_per_sample =  bit_per_sample / 8;
     bytes_per_sample *= channel;
 
-	if ((err = snd_pcm_hw_params_set_buffer_time_near(handle, alsa_hwparams, &alsa_buffer_time, NULL)) < 0)
+	if ((err = snd_pcm_hw_params_set_buffer_time_near(handle, alsa_hwparams,
+							  &alsa_buffer_time, NULL)) < 0)
 	{
-	    printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_UnableToSetBufferTimeNear], snd_strerror(err));
-	    return ERR_ALSA_UnableToSetBufferTimeNear;
+	    printf("%d:%s\n", ALSA_UnableToSetBufferTimeNear,
+		snd_strerror(err));
+	    return 0;
 	}
 
-	if ((err = snd_pcm_hw_params_set_periods_near(handle, alsa_hwparams, &alsa_fragcount, NULL)) < 0) 
+	if ((err = snd_pcm_hw_params_set_periods_near(handle, alsa_hwparams,
+						      &alsa_fragcount, NULL)) < 0) 
 	{
-	     printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_UnableToSetPeriods], snd_strerror(err));
-	     return ERR_ALSA_UnableToSetPeriods;
+	     printf("%d:%s\n", ALSA_UnableToSetPeriods,
+		 snd_strerror(err));
+	     return 0;
 	}
 
       /* finally install hardware parameters */
     if ((err = snd_pcm_hw_params(handle, alsa_hwparams)) < 0)
 	{
-	     printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_UnableToSetHwParameters], snd_strerror(err));
-	     return ERR_ALSA_UnableToSetHwParameters;
+	     printf("%d:%s\n", ALSA_UnableToSetHwParameters,
+		 snd_strerror(err));
+	     return 0;
 	}
       // end setting hw-params
 
@@ -331,8 +326,8 @@ static int init(snd_pcm_t *handle, play_wave_info *wave_info)
       // gets buffersize for control
     if ((err = snd_pcm_hw_params_get_buffer_size(alsa_hwparams, &bufsize)) < 0)
 	{
-	     printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_UnableToGetBufferSize], snd_strerror(err));
-	     return ERR_ALSA_UnableToGetBufferSize;
+	     printf("%d:%s\n", ALSA_UnableToGetBufferSize, snd_strerror(err));
+	     return 0;
 	}
     else 
     {
@@ -342,8 +337,8 @@ static int init(snd_pcm_t *handle, play_wave_info *wave_info)
 
     if ((err = snd_pcm_hw_params_get_period_size(alsa_hwparams, &chunk_size, NULL)) < 0) 
     {
-		printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_UnableToGetPeriodSize], snd_strerror(err));
-		return ERR_ALSA_UnableToGetPeriodSize;
+		printf("%d:%s\n",ALSA_UnableToGetPeriodSize, snd_strerror(err));
+		return 0;
     } 
     else 
     {
@@ -355,14 +350,16 @@ static int init(snd_pcm_t *handle, play_wave_info *wave_info)
       /* setting software parameters */
     if ((err = snd_pcm_sw_params_current(handle, alsa_swparams)) < 0) 
     {
-		printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_UnableToGetSwParameters], snd_strerror(err));
-		return ERR_ALSA_UnableToGetSwParameters;
+		printf("%d:%s\n", ALSA_UnableToGetSwParameters,
+		       snd_strerror(err));
+		return 0;
     }
 #if SND_LIB_VERSION >= 0x000901
     if ((err = snd_pcm_sw_params_get_boundary(alsa_swparams, &boundary)) < 0) 
     {
-		printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_UnableToGetBoundary], snd_strerror(err));
-		return ERR_ALSA_UnableToGetBoundary;
+		printf("%d:%s\n", ALSA_UnableToGetBoundary,
+		       snd_strerror(err));
+		return 0;
     }
 #else
     boundary = 0x7fffffff;
@@ -370,27 +367,31 @@ static int init(snd_pcm_t *handle, play_wave_info *wave_info)
       /* start playing when one period has been written */
     if ((err = snd_pcm_sw_params_set_start_threshold(handle, alsa_swparams, chunk_size)) < 0) 
     {
-		printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_UnableToSetStartThreshold], snd_strerror(err));
-		return ERR_ALSA_UnableToSetStartThreshold;
+		printf("%d:%s\n", ALSA_UnableToSetStartThreshold,
+		       snd_strerror(err));
+		return 0;
     }
       /* disable underrun reporting */
     if ((err = snd_pcm_sw_params_set_stop_threshold(handle, alsa_swparams, boundary)) < 0) 
     {
-		printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_UnableToSetStopThreshold], snd_strerror(err));
-		return ERR_ALSA_UnableToSetStopThreshold;
+		printf("%d:%s\n", ALSA_UnableToSetStopThreshold,
+		       snd_strerror(err));
+		return 0;
     }
 #if SND_LIB_VERSION >= 0x000901
       /* play silence when there is an underrun */
     if ((err = snd_pcm_sw_params_set_silence_size(handle, alsa_swparams, boundary)) < 0) 
     {
-		printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_UnableToSetSilenceSize], snd_strerror(err));
-		return ERR_ALSA_UnableToSetSilenceSize;
+		printf("%d:%s\n", ALSA_UnableToSetSilenceSize,
+		       snd_strerror(err));
+		return 0;
     }
 #endif
     if ((err = snd_pcm_sw_params(handle, alsa_swparams)) < 0) 
     {
-		printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_UnableToGetSwParameters], snd_strerror(err));
-		return ERR_ALSA_UnableToGetSwParameters;
+		printf("%d:%s\n", ALSA_UnableToGetSwParameters,
+		       snd_strerror(err));
+		return 0;
     }
       /* end setting sw-params */
 
@@ -567,37 +568,36 @@ int set_volumn(const char *mixer_name, long left_vol, long right_vol)
 
 	if ((err = snd_mixer_open(&handle, 0)) < 0) 
 	{
-		printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_MixerOpenError], snd_strerror(err));
-		return ERR_ALSA_MixerOpenError;
+		return CONTROL_ERROR;
     }
 
 	if ((err = snd_mixer_attach(handle, DEVICE)) < 0) {
-		printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_MixerAttachError], snd_strerror(err));
+		printf("MSGTR_AO_ALSA_MixerAttachError:%s\n",snd_strerror(err));
 		snd_mixer_close(handle);
-		return ERR_ALSA_MixerAttachError;
+		return CONTROL_ERROR;
 	}
 	
 	if ((err = snd_mixer_selem_register(handle, NULL, NULL)) < 0)
 	{
-		printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_MixerRegisterError], snd_strerror(err));
+		printf("MSGTR_AO_ALSA_MixerRegisterError:%s\n", snd_strerror(err));
 		snd_mixer_close(handle);
-		return ERR_ALSA_MixerRegisterError;
+		return CONTROL_ERROR;
 	}
 	err = snd_mixer_load(handle);
 	if (err < 0) 
 	{
-		printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_MixerLoadError], snd_strerror(err));
+		printf("ALSA_MixerLoadError:%s\n", snd_strerror(err));
 		snd_mixer_close(handle);
-		return ERR_ALSA_MixerLoadError;
+		return CONTROL_ERROR;
 	}
 	
 	elem = snd_mixer_find_selem(handle, sid);
 	if (!elem) 
 	{
-		printf("[%s_%s_%d]%s%s:[name]%s  [index]%d\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_UnableToFindSimpleControl], 
+		printf("ALSA_UnableToFindSimpleControl:[name]%s  [index]%d\n",
 				snd_mixer_selem_id_get_name(sid), snd_mixer_selem_id_get_index(sid));
 				snd_mixer_close(handle);
-		return ERR_ALSA_UnableToFindSimpleControl;
+		return CONTROL_ERROR;
 	}
 	
 	snd_mixer_selem_get_playback_volume_range(elem,&pmin,&pmax);
@@ -610,18 +610,16 @@ int set_volumn(const char *mixer_name, long left_vol, long right_vol)
 	//setting channels
 	if ((err = snd_mixer_selem_set_playback_volume(elem, SND_MIXER_SCHN_FRONT_LEFT, set_vol_left)) < 0) 
 	{
-		printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_MixerSetVolumeError], snd_strerror(err));
 		snd_mixer_close(handle);
-		return ERR_ALSA_MixerSetVolumeError;
+		return CONTROL_ERROR;
 	}
 	
 	
 	set_vol_right = set_vol_right / f_multi + pmin + 0.5;
 	if ((err = snd_mixer_selem_set_playback_volume(elem, SND_MIXER_SCHN_FRONT_RIGHT, set_vol_right)) < 0) 
 	{
-		printf("[%s_%s_%d]%s:%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_MixerSetVolumeError], snd_strerror(err));
 		snd_mixer_close(handle);
-		return ERR_ALSA_MixerSetVolumeError;
+		return CONTROL_ERROR;
 	}
 	
 	if (snd_mixer_selem_has_playback_switch(elem)) 
@@ -641,7 +639,7 @@ int set_volumn(const char *mixer_name, long left_vol, long right_vol)
 
 	snd_mixer_close(handle);
 	
-	return ERR_ZERO;
+	return CONTROL_OK;
 }
 
 /*
@@ -655,11 +653,9 @@ static int play(snd_pcm_t *handler, void* data, int len, int flags)
 {
 	int num_frames;
 	snd_pcm_sframes_t res = 0;
-	
 	if (!(flags & PLAY_FINAL_CHUNK))
-	{
 	    len = len / sl_outburst * sl_outburst;
-	}    
+	    
 	num_frames = len / bytes_per_sample;
 
 	//mp_msg(MSGT_AO,MSGL_ERR,"alsa-play: frames=%i, len=%i\n",num_frames,len);
@@ -669,14 +665,12 @@ static int play(snd_pcm_t *handler, void* data, int len, int flags)
 	if (!handler) 
 	{
 		//mp_msg(MSGT_AO,MSGL_ERR,MSGTR_AO_ALSA_DeviceConfigurationError);
-		printf("[%s_%s_%d]%s\n", __FILE__, __FUNCTION__, __LINE__,  err_msg[ERR_HANDLE_NULL]);
 		return 0;
 	}
 
 	if (num_frames == 0)
 	{
-		printf("[%s_%s_%d]%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_PLAYBACK_NO_FRAME]);
-		return 0;
+	  return 0;
 	}
 	
 	do 
@@ -691,7 +685,6 @@ static int play(snd_pcm_t *handler, void* data, int len, int flags)
 	    else if (res == -ESTRPIPE) 
 	    {	/* suspend */
 			//mp_msg(MSGT_AO,MSGL_INFO,MSGTR_AO_ALSA_PcmInSuspendModeTryingResume);
-			printf("[%s_%s_%d]%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_PcmInSuspendModeTryingResume]);
 			while ((res = snd_pcm_resume(handler)) == -EAGAIN)
 				sleep(1);
 	    }
@@ -699,12 +692,10 @@ static int play(snd_pcm_t *handler, void* data, int len, int flags)
 	    {
 			//mp_msg(MSGT_AO,MSGL_ERR,MSGTR_AO_ALSA_WriteError, snd_strerror(res));
 			//mp_msg(MSGT_AO,MSGL_INFO,MSGTR_AO_ALSA_TryingToResetSoundcard);
-			printf("[%s_%s_%d]%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_TryingToResetSoundcard]);
 			if ((res = snd_pcm_prepare(handler)) < 0) 
 			{
 			  //mp_msg(MSGT_AO,MSGL_ERR,MSGTR_AO_ALSA_PcmPrepareError, snd_strerror(res));
-			  	printf("[%s_%s_%d]%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_ALSA_PcmPrepareError]);
-				break;
+			  break;
 			}
 			res = 0;
 	    }
@@ -724,16 +715,19 @@ int play_file(snd_pcm_t *handler, const char *file_name, int vol_left, int vol_r
 	int len = 0;
 	memset(buf, 0x00, BUFSIZE);
 	
+	//assert(handler != NULL);
+	//assert(file_name != NULL);
 	if (NULL == handler)
 	{
-		printf("[%s_%s_%d]%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_DEVICE_CLOSE]);
+		printf("[%s_%s_%d]%s", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_DEVICE_CLOSE]);
 		return ERR_DEVICE_CLOSE;
 	}
 	
 	if ((wave_info.fp = fopen(file_name, "r")) < 0)
 	{
-		fprintf (stderr, "[%s_%s_%d]%s   ファイル名=%s\n", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_FILE_OPEN], file_name);
-		return ERR_FILE_OPEN;
+		fprintf (stderr, "cannot open file %s\n", 
+			 file_name);
+		exit (1);
 	}
 	
 	wave_read_file_header(&wave_info);
@@ -744,14 +738,16 @@ int play_file(snd_pcm_t *handler, const char *file_name, int vol_left, int vol_r
 	
 	if ( ( len = ftell( wave_info.fp ) ) == -1 ) 
 	{
-		fprintf(stderr, "[%s:%d:%s]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_NOT_FIND_DATA] );
+		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_NOT_FIND_DATA] );
 		return ERR_NOT_FIND_DATA;
 	}
-	
+		char a = fgetc(wave_info.fp);
+	printf("%d\n", a);
+	//printf("len %d\n", len);
 	len = len - wave_info.play_start_pos;
 	if (0 != (len % bytes_per_sample))
 	{
-		printf("[%s:%d:%s]%s len=%d\n",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_SIZE] , len);
+		printf("size error%d\n", len);
 		return 0;
 	}
 	
@@ -761,20 +757,24 @@ int play_file(snd_pcm_t *handler, const char *file_name, int vol_left, int vol_r
 	
 	fseek( wave_info.fp, wave_info.play_start_pos, SEEK_SET );
 	
+
+	
 	current_location = wave_info.play_start_pos;
 	
 	while (!feof(wave_info.fp))
 	{
 		read_len= fread(buf, 1, sl_outburst, wave_info.fp);
-		//
+		//printf ("cann2ot rqqrt file %d\n", read_len);
 		if (feof(wave_info.fp))
 		{
 			write_len = play(handler, buf, read_len, PLAY_FINAL_CHUNK);
 			snd_pcm_drain(handler);
+			//fprintf (stderr, "cann2ot rqqrt file %s\n", file_name);
 		}
 		else
 		{
 			write_len = play(handler, buf, read_len, 0);
+			//fprintf (stderr, "3cannot rqqrt file %s\n", file_name);
 		}
 		
 		current_location += write_len;
@@ -782,9 +782,11 @@ int play_file(snd_pcm_t *handler, const char *file_name, int vol_left, int vol_r
 		if (write_len != read_len)
 		{
 			fseek( wave_info.fp, current_location, SEEK_SET );
+			//fprintf (stderr, "canno4t rqqrt file %s\n", file_name);
 		}
 		
 	}
+	//fprintf (stderr, "cannot rqqrt file %s\n", file_name);
 	
 	return ERR_ZERO;	
 }

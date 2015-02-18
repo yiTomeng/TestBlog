@@ -1,9 +1,5 @@
-#ifndef SOUND_LIB_H
-#define SOUND_LIB_H
-#include <alsa/asoundlib.h>
-#include "sound_lib_err.h"
-/*
-#define FILE_NAME 32					//ファイル名サイズ
+#ifndef SOUND_LIB_ERR_H
+#define SOUND_LIB_ERR_H
 
 #define	ERR_STR_ZERO 									 "エラー無し。"
 
@@ -25,6 +21,7 @@
 #define	ERR_STR_SIZE									 "ファイルサイズはヘッダサイズより小さい"
 #define	ERR_STR_HANDLE_NULL		 						 "ハンドルはNULL"
 #define	ERR_STR_HANDLE_NOT_NULL		 					 "ハンドルはNULLではありません"
+#define	ERR_STR_PLAYBACK_NO_FRAME		 				 "再生できるフレームがありません"
 
 #define	ERR_STR_NOT_RIFF 								 "Specified file is not RIFF file.\n"
 #define	ERR_STR_NOT_WAVE								 "Specified file is not WAVE file.\n"
@@ -55,11 +52,17 @@
 #define	ERR_STR_ALSA_UnableToSetStopThreshold			 "StopThresholdの設定は失敗しました"
 #define	ERR_STR_ALSA_UnableToSetSilenceSize				 "SilenceSizeの設定は失敗しました"
 #define	ERR_STR_ALSA_UnableToGetSwParameters			 "ソフトウェアパラメータの取得は失敗しました"
+#define	ERR_STR_ALSA_UnableToFindSimpleControl			 "項目を見つけません"
+#define	ERR_STR_ALSA_UnableToSetPeriods					 "Periodsは設定できません"	
+#define	ERR_STR_ALSA_PcmInSuspendModeTryingResume		 "停止モードでResumeを試す"
+#define	ERR_STR_ALSA_TryingToResetSoundcard				 "リセット音声カード"
+#define	ERR_STR_ALSA_PcmPrepareError					 "PCMの準備は失敗しました"
+
+#define	ERR_STR_ALSA_MixerOpenError						 "ミキサーオープンは失敗しました"
 #define	ERR_STR_ALSA_MixerAttachError					 "ミキサー接続失敗しました"
 #define	ERR_STR_ALSA_MixerRegisterError					 "ミキサー登録失敗しました"
 #define	ERR_STR_ALSA_MixerLoadError						 "ミキサーロード失敗しました"
-#define	ERR_STR_ALSA_UnableToFindSimpleControl			 "項目を見つけません"
-#define	ERR_STR_ALSA_UnableToSetPeriods					 "Periodsは設定できません"
+#define	ERR_STR_ALSA_MixerSetVolumeError				 "ミキサー音声ボリュウム設定は失敗しました"
 
 //エラーメッセージコード
 enum ERROR_CODE
@@ -84,6 +87,7 @@ enum ERROR_CODE
 	ERR_SIZE,
 	ERR_HANDLE_NULL,		
 	ERR_HANDLE_NOT_NULL,
+	ERR_PLAYBACK_NO_FRAME,
 	
 	ERR_NOT_RIFF,
 	ERR_NOT_WAVE,
@@ -113,19 +117,15 @@ enum ERROR_CODE
 	ERR_ALSA_UnableToSetStopThreshold,
 	ERR_ALSA_UnableToSetSilenceSize,
 	ERR_ALSA_UnableToGetSwParameters,
+	ERR_ALSA_UnableToFindSimpleControl,
+	ERR_ALSA_UnableToSetPeriods,
+	ERR_ALSA_PcmInSuspendModeTryingResume,
+	ERR_ALSA_TryingToResetSoundcard,
+	ERR_ALSA_PcmPrepareError,
+	ERR_ALSA_MixerOpenError,
 	ERR_ALSA_MixerAttachError,
 	ERR_ALSA_MixerRegisterError,
 	ERR_ALSA_MixerLoadError,
-	ERR_ALSA_UnableToFindSimpleControl,
-	ERR_ALSA_UnableToSetPeriods		
+	ERR_ALSA_MixerSetVolumeError		
 };  
-*/
-#define CONTROL_ERROR 	-1
-#define CONTROL_OK 		0
-
-
-extern int open_device(snd_pcm_t **handle);
-extern close_device(snd_pcm_t *handle);
-extern int play_file(snd_pcm_t *handler, const char *file_name, int vol_left, int vol_right);
-
 #endif
