@@ -1,21 +1,43 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include "sound_lib.h"
 			
 
-#define ERR_MSG_SIZE		64												//エラーメッセージサイズ
-#define BUFSIZE				64000											//バッファサイズ
-#define MIXER_MASTER_NAME	"Master"										//音声項目Master
-#define MIXER_PCM_NAME		"PCM"											//音声項目PCM
-#define DEVICE				"default"										//出力デバイス
-#define FORMAT_U8			8												//8位量子化数
-#define FORMAT_S16_LE		16												//16位量子化数
-#define PLAY_FINAL_CHUNK	1												//最後かどうかのフラグ
+#define ERR_MSG_SIZE		64												//エラーメッセージ
+#define BUFSIZE				64000
+#define MIXER_MASTER_NAME	"Master"
+#define MIXER_PCM_NAME		"PCM"
+#define DEVICE				"default"
+#define FORMAT_U8			8
+#define FORMAT_S16_LE		16
+#define PLAY_FINAL_CHUNK	1
 
 #define DEF_ERR(_code, _str) [_code] = (_str)
 
-
+static enum alsa_err_def
+{
+	ALSA_UnableToGetInitialParameters,
+	ALSA_UnableToSetAccessType,
+	ALSA_formatNotSupportedByHardware,
+	ALSA_UnableToSetFormat,
+	ALSA_UnableToSetChannels,
+	ALSA_UnableToDisableResampling,
+	ALSA_UnableToSetSamplerate2,
+	ALSA_UnableToSetBufferTimeNear,
+	ALSA_UnableToSetHwParameters,
+	ALSA_UnableToGetBufferSize,
+	ALSA_UnableToGetPeriodSize,
+	ALSA_UnableToGetBoundary,
+	ALSA_UnableToSetStartThreshold,
+	ALSA_UnableToSetStopThreshold,
+	ALSA_UnableToSetSilenceSize,
+	ALSA_UnableToGetSwParameters,
+	ALSA_MixerAttachError,
+	ALSA_MixerRegisterError,
+	ALSA_MixerLoadError,
+	ALSA_UnableToFindSimpleControl,
+	ALSA_UnableToSetPeriods
+}alsa_err;
 //エラーメッセージ
 static const char err_msg[][ERR_MSG_SIZE] = {
 	DEF_ERR(ERR_ZERO, 					ERR_STR_ZERO),
@@ -42,34 +64,6 @@ static const char err_msg[][ERR_MSG_SIZE] = {
 	DEF_ERR(ERR_WRITE_RATE, 			ERR_STR_WRITE_RATE),		
 	DEF_ERR(ERR_WRITE_CHANNEL,			ERR_STR_WRITE_CHANNEL)
 };
-
-
-static enum alsa_err_def
-{
-	ALSA_UnableToGetInitialParameters,
-	ALSA_UnableToSetAccessType,
-	ALSA_formatNotSupportedByHardware,
-	ALSA_UnableToSetFormat,
-	ALSA_UnableToSetChannels,
-	ALSA_UnableToDisableResampling,
-	ALSA_UnableToSetSamplerate2,
-	ALSA_UnableToSetBufferTimeNear,
-	ALSA_UnableToSetHwParameters,
-	ALSA_UnableToGetBufferSize,
-	ALSA_UnableToGetPeriodSize,
-	ALSA_UnableToGetBoundary,
-	ALSA_UnableToSetStartThreshold,
-	ALSA_UnableToSetStopThreshold,
-	ALSA_UnableToSetSilenceSize,
-	ALSA_UnableToGetSwParameters,
-	ALSA_MixerAttachError,
-	ALSA_MixerRegisterError,
-	ALSA_MixerLoadError,
-	ALSA_UnableToFindSimpleControl,
-	ALSA_UnableToSetPeriods
-}alsa_err;
-
-
 
 //WAVファイルのヘッダ
 typedef struct
@@ -104,7 +98,7 @@ typedef struct
 static snd_pcm_uframes_t sl_buffersize = 0; 
 static snd_pcm_uframes_t sl_outburst = 0; 
 static size_t bytes_per_sample = 0;
-static int set_volumn(const char *mixer_name, long left_vol, long right_vol);
+static int set_volumn(char *mixer_name, long left_vol, long right_vol);
 static int init(snd_pcm_t *handle, play_wave_info *wave_info);
 static int play(snd_pcm_t *handler, void* data, int len, int flags);
 				    
@@ -112,19 +106,9 @@ int open_device(snd_pcm_t **handle)
 {
 	int err = ERR_ZERO;
 	
-	//assert(*handle == NULL);
-	if (NULL != *handle)
-	{
-		printf("[%s_%s_%d]%s", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_DEVICE_OPEN]);
-		return ERR_DEVICE_OPEN;
-	}
-	if ((err = snd_pcm_open(handle, DEVICE, SND_PCM_STREAM_PLAYBACK, 0)) < 0)
-	{
-		printf("[%s_%s_%d]%s", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_DEVICE_OPEN]);
-		return ERR_DEVICE_OPEN;
-	}
+	assert(*handle == NULL);
 	
-	if (NULL == *handle)
+	if ((err = snd_pcm_open(handle, DEVICE, SND_PCM_STREAM_PLAYBACK, 0)) < 0)
 	{
 		printf("[%s_%s_%d]%s", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_DEVICE_OPEN]);
 		return ERR_DEVICE_OPEN;
@@ -137,12 +121,8 @@ int close_device(snd_pcm_t *handle)
 {
 	int err = ERR_ZERO;
 	
-	//assert(handle != NULL);
-	if (NULL == handle)
-	{
-		printf("[%s_%s_%d]%s", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_DEVICE_CLOSE]);
-		return ERR_DEVICE_CLOSE;
-	}
+	assert(handle != NULL);
+	
 	if ((err = snd_pcm_close(handle)) < 0)
 	{
 		printf("[%s_%s_%d]%s", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_DEVICE_CLOSE]);
@@ -154,7 +134,6 @@ int close_device(snd_pcm_t *handle)
 	return ERR_ZERO;
 }
 
-/*
 static void reset(snd_pcm_t *handle)
 {
     int err;
@@ -171,7 +150,8 @@ static void reset(snd_pcm_t *handle)
     }
     return;
 }
-*/
+
+//int init()
 
 /*
     open & setup audio device
@@ -193,7 +173,6 @@ static int init(snd_pcm_t *handle, play_wave_info *wave_info)
     snd_pcm_uframes_t bufsize;
     snd_pcm_uframes_t boundary;
    
-	assert(handle != NULL);
 	
     //handle = NULL;
 #if SND_LIB_VERSION >= 0x010005
@@ -224,9 +203,9 @@ static int init(snd_pcm_t *handle, play_wave_info *wave_info)
     snd_pcm_hw_params_alloca(&alsa_hwparams);
     snd_pcm_sw_params_alloca(&alsa_swparams);
 
-	assert(alsa_hwparams != NULL);
-	assert(alsa_swparams != NULL);
-
+	//assert(alsa_hwparams == NULL);
+	assert(handle != NULL);
+	
     // setting hw-parameters
     if ((err = snd_pcm_hw_params_any(handle, alsa_hwparams)) < 0)
 	{
@@ -234,6 +213,7 @@ static int init(snd_pcm_t *handle, play_wave_info *wave_info)
 	  	return 0;
 	}
 
+//	assert(0 == 1);
 	
     err = snd_pcm_hw_params_set_access(handle, alsa_hwparams, SND_PCM_ACCESS_RW_INTERLEAVED);
     if (err < 0) 
@@ -270,18 +250,16 @@ static int init(snd_pcm_t *handle, play_wave_info *wave_info)
          even per file if desired */
          
 #if SND_LIB_VERSION >= 0x010009
-#if 0
 	printf("rate before:%d\n", rate);
-	
+	#if 0
     if ((err = snd_pcm_hw_params_set_rate_resample(handle, alsa_hwparams, 0)) < 0)
 	{
 		printf("%d:%s\n",ALSA_UnableToDisableResampling,
 		snd_strerror(err));
 	  return 0;
 	}
-	
-	printf("rate after1:%d\n", rate);
 	#endif
+	printf("rate after1:%d\n", rate);
 #endif
 /**/
     if ((err = snd_pcm_hw_params_set_rate_near(handle, alsa_hwparams,
@@ -293,9 +271,10 @@ static int init(snd_pcm_t *handle, play_wave_info *wave_info)
 		 snd_strerror(err));
 		 return 0;
     }
-    
+	printf("rate after2:%d\n", rate);
     bytes_per_sample =  bit_per_sample / 8;
     bytes_per_sample *= channel;
+   // ao_data.bps = ao_data.samplerate * bytes_per_sample;
 
 	if ((err = snd_pcm_hw_params_set_buffer_time_near(handle, alsa_hwparams,
 							  &alsa_buffer_time, NULL)) < 0)
@@ -512,7 +491,7 @@ static int wave_read_file_header(play_wave_info *wave_info)
 }
 
 
-int set_volumn(const char *mixer_name, long left_vol, long right_vol)
+int set_volumn(char *mixer_name, long left_vol, long right_vol)
 {
 	long pmin, pmax;
 	float f_multi;
@@ -522,7 +501,7 @@ int set_volumn(const char *mixer_name, long left_vol, long right_vol)
     snd_mixer_selem_id_t *sid;
     
 	int mix_index = 0;
-	const char *mix_name = mixer_name;
+	char *mix_name = mixer_name;
 	long set_vol_left = left_vol;
 	long set_vol_right = right_vol;
 	
@@ -571,7 +550,7 @@ int set_volumn(const char *mixer_name, long left_vol, long right_vol)
 		return CONTROL_ERROR;
     }
 
-	if ((err = snd_mixer_attach(handle, DEVICE)) < 0) {
+	if ((err = snd_mixer_attach(handle, "default")) < 0) {
 		printf("MSGTR_AO_ALSA_MixerAttachError:%s\n",snd_strerror(err));
 		snd_mixer_close(handle);
 		return CONTROL_ERROR;
@@ -638,7 +617,6 @@ int set_volumn(const char *mixer_name, long left_vol, long right_vol)
 	}
 
 	snd_mixer_close(handle);
-	
 	return CONTROL_OK;
 }
 
@@ -660,8 +638,6 @@ static int play(snd_pcm_t *handler, void* data, int len, int flags)
 
 	//mp_msg(MSGT_AO,MSGL_ERR,"alsa-play: frames=%i, len=%i\n",num_frames,len);
 
-	assert(handler != NULL);
-	
 	if (!handler) 
 	{
 		//mp_msg(MSGT_AO,MSGL_ERR,MSGTR_AO_ALSA_DeviceConfigurationError);
@@ -669,10 +645,8 @@ static int play(snd_pcm_t *handler, void* data, int len, int flags)
 	}
 
 	if (num_frames == 0)
-	{
 	  return 0;
-	}
-	
+
 	do 
 	{
 		res = snd_pcm_writei(handler, data, num_frames);
@@ -686,7 +660,7 @@ static int play(snd_pcm_t *handler, void* data, int len, int flags)
 	    {	/* suspend */
 			//mp_msg(MSGT_AO,MSGL_INFO,MSGTR_AO_ALSA_PcmInSuspendModeTryingResume);
 			while ((res = snd_pcm_resume(handler)) == -EAGAIN)
-				sleep(1);
+			sleep(1);
 	    }
 	    if (res < 0) 
 	    {
@@ -710,18 +684,8 @@ int play_file(snd_pcm_t *handler, const char *file_name, int vol_left, int vol_r
 	
 	play_wave_info wave_info;
 	char buf[BUFSIZE];
-	int read_len = 0, write_len = 0;
-	int current_location = 0;
-	int len = 0;
+	int num = 0;
 	memset(buf, 0x00, BUFSIZE);
-	
-	//assert(handler != NULL);
-	//assert(file_name != NULL);
-	if (NULL == handler)
-	{
-		printf("[%s_%s_%d]%s", __FILE__, __FUNCTION__, __LINE__, err_msg[ERR_DEVICE_CLOSE]);
-		return ERR_DEVICE_CLOSE;
-	}
 	
 	if ((wave_info.fp = fopen(file_name, "r")) < 0)
 	{
@@ -731,62 +695,30 @@ int play_file(snd_pcm_t *handler, const char *file_name, int vol_left, int vol_r
 	}
 	
 	wave_read_file_header(&wave_info);
-	
+	assert(handler != NULL);
 	init(handler, &wave_info);
-	
-	fseek( wave_info.fp, 0, SEEK_END);
-	
-	if ( ( len = ftell( wave_info.fp ) ) == -1 ) 
-	{
-		fprintf(stderr, "[%s:%d:%s()]%s。",  __FILE__, __LINE__, __FUNCTION__, err_msg[ERR_NOT_FIND_DATA] );
-		return ERR_NOT_FIND_DATA;
-	}
-		char a = fgetc(wave_info.fp);
-	printf("%d\n", a);
-	//printf("len %d\n", len);
-	len = len - wave_info.play_start_pos;
-	if (0 != (len % bytes_per_sample))
-	{
-		printf("size error%d\n", len);
-		return 0;
-	}
 	
 	set_volumn(MIXER_MASTER_NAME, vol_left, vol_right);
 
 	set_volumn(MIXER_PCM_NAME, vol_left, vol_right);
 	
 	fseek( wave_info.fp, wave_info.play_start_pos, SEEK_SET );
-	
 
-	
-	current_location = wave_info.play_start_pos;
 	
 	while (!feof(wave_info.fp))
 	{
-		read_len= fread(buf, 1, sl_outburst, wave_info.fp);
-		//printf ("cann2ot rqqrt file %d\n", read_len);
+		num = fread(buf, 1, sl_outburst, wave_info.fp);
+		
 		if (feof(wave_info.fp))
 		{
-			write_len = play(handler, buf, read_len, PLAY_FINAL_CHUNK);
+			play(handler, buf, num, PLAY_FINAL_CHUNK);
 			snd_pcm_drain(handler);
-			//fprintf (stderr, "cann2ot rqqrt file %s\n", file_name);
 		}
 		else
 		{
-			write_len = play(handler, buf, read_len, 0);
-			//fprintf (stderr, "3cannot rqqrt file %s\n", file_name);
+			play(handler, buf, num, 0);
 		}
-		
-		current_location += write_len;
-		
-		if (write_len != read_len)
-		{
-			fseek( wave_info.fp, current_location, SEEK_SET );
-			//fprintf (stderr, "canno4t rqqrt file %s\n", file_name);
-		}
-		
 	}
-	//fprintf (stderr, "cannot rqqrt file %s\n", file_name);
 	
 	return ERR_ZERO;	
 }

@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 	
 	assert(handler != NULL);
 	
-	play_file(handler, "../test.wav", left_vol, right_vol);
+	play_file(handler, "../test3.wav", left_vol, right_vol);
 
 	close_device(handler);
 	
