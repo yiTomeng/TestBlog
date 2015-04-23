@@ -69,6 +69,7 @@ int main(int argc, char *argv[])
 	}
 */
 
+/*test 6
 if ( (err = 0) == 0)
 	{
 		printf("err:%d\n", err);
@@ -79,6 +80,33 @@ if ( (err = 0) == 0)
 	{
 		printf("err:%d\n", err);
 	}
-
+*/
+	
+	/*test 7
+	if ( (err = 1) < 0)
+	{
+		printf("err:%d\n", err);
+	}
+	
+	err = 2;
+	if (err < 0)
+	{
+		printf("err:%d\n", err);
+	}
+	*/
+	
+	/*test 8
+	if ( (err = 1) >= 0)
+	{
+		printf("err:%d\n", err);
+	}
+	
+	err = 2;
+	if (err >= 0)
+	{
+		printf("err:%d\n", err);
+	}
+	*/
+	
 	return 0;
 }
