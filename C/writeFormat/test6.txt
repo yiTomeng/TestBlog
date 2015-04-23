@@ -1,0 +1,708 @@
+
+test6:     ファイル形式 pei-i386
+
+
+セクション .text の逆アセンブル:
+
+00401000 <_WinMainCRTStartup>:
+  401000:	55                   	push   %ebp
+  401001:	89 e5                	mov    %esp,%ebp
+  401003:	83 ec 18             	sub    $0x18,%esp
+  401006:	83 e4 f0             	and    $0xfffffff0,%esp
+  401009:	c7 04 24 90 11 40 00 	movl   $0x401190,(%esp)
+  401010:	e8 eb 01 00 00       	call   401200 <_cygwin_crt0>
+  401015:	c7 44 24 08 00 00 00 	movl   $0x0,0x8(%esp)
+  40101c:	00 
+  40101d:	c7 44 24 04 00 00 00 	movl   $0x0,0x4(%esp)
+  401024:	00 
+  401025:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+  40102c:	e8 ff 01 00 00       	call   401230 <_cygwin_premain0>
+  401031:	c7 44 24 08 00 00 00 	movl   $0x0,0x8(%esp)
+  401038:	00 
+  401039:	c7 44 24 04 00 00 00 	movl   $0x0,0x4(%esp)
+  401040:	00 
+  401041:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+  401048:	e8 f3 01 00 00       	call   401240 <_cygwin_premain1>
+  40104d:	c7 44 24 08 00 00 00 	movl   $0x0,0x8(%esp)
+  401054:	00 
+  401055:	c7 44 24 04 00 00 00 	movl   $0x0,0x4(%esp)
+  40105c:	00 
+  40105d:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+  401064:	e8 e7 01 00 00       	call   401250 <_cygwin_premain2>
+  401069:	c7 44 24 08 00 00 00 	movl   $0x0,0x8(%esp)
+  401070:	00 
+  401071:	c7 44 24 04 00 00 00 	movl   $0x0,0x4(%esp)
+  401078:	00 
+  401079:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+  401080:	e8 db 01 00 00       	call   401260 <_cygwin_premain3>
+  401085:	c9                   	leave  
+  401086:	c3                   	ret    
+  401087:	90                   	nop
+  401088:	90                   	nop
+  401089:	90                   	nop
+  40108a:	90                   	nop
+  40108b:	90                   	nop
+  40108c:	90                   	nop
+  40108d:	90                   	nop
+  40108e:	90                   	nop
+  40108f:	90                   	nop
+
+00401090 <___gcc_register_frame>:
+  401090:	55                   	push   %ebp
+  401091:	89 e5                	mov    %esp,%ebp
+  401093:	56                   	push   %esi
+  401094:	53                   	push   %ebx
+  401095:	83 ec 10             	sub    $0x10,%esp
+  401098:	8b 1d bc 60 40 00    	mov    0x4060bc,%ebx
+  40109e:	c7 04 24 00 30 40 00 	movl   $0x403000,(%esp)
+  4010a5:	ff d3                	call   *%ebx
+  4010a7:	89 c6                	mov    %eax,%esi
+  4010a9:	83 ec 04             	sub    $0x4,%esp
+  4010ac:	85 f6                	test   %esi,%esi
+  4010ae:	b8 00 00 00 00       	mov    $0x0,%eax
+  4010b3:	74 29                	je     4010de <___gcc_register_frame+0x4e>
+  4010b5:	c7 04 24 00 30 40 00 	movl   $0x403000,(%esp)
+  4010bc:	ff 15 c4 60 40 00    	call   *0x4060c4
+  4010c2:	83 ec 04             	sub    $0x4,%esp
+  4010c5:	a3 18 50 40 00       	mov    %eax,0x405018
+  4010ca:	c7 44 24 04 0f 30 40 	movl   $0x40300f,0x4(%esp)
+  4010d1:	00 
+  4010d2:	89 34 24             	mov    %esi,(%esp)
+  4010d5:	ff 15 c0 60 40 00    	call   *0x4060c0
+  4010db:	83 ec 08             	sub    $0x8,%esp
+  4010de:	85 c0                	test   %eax,%eax
+  4010e0:	74 11                	je     4010f3 <___gcc_register_frame+0x63>
+  4010e2:	c7 44 24 04 00 50 40 	movl   $0x405000,0x4(%esp)
+  4010e9:	00 
+  4010ea:	c7 04 24 38 40 40 00 	movl   $0x404038,(%esp)
+  4010f1:	ff d0                	call   *%eax
+  4010f3:	a1 20 20 40 00       	mov    0x402020,%eax
+  4010f8:	85 c0                	test   %eax,%eax
+  4010fa:	74 38                	je     401134 <___gcc_register_frame+0xa4>
+  4010fc:	c7 04 24 25 30 40 00 	movl   $0x403025,(%esp)
+  401103:	ff d3                	call   *%ebx
+  401105:	ba 00 00 00 00       	mov    $0x0,%edx
+  40110a:	83 ec 04             	sub    $0x4,%esp
+  40110d:	85 c0                	test   %eax,%eax
+  40110f:	74 16                	je     401127 <___gcc_register_frame+0x97>
+  401111:	c7 44 24 04 33 30 40 	movl   $0x403033,0x4(%esp)
+  401118:	00 
+  401119:	89 04 24             	mov    %eax,(%esp)
+  40111c:	ff 15 c0 60 40 00    	call   *0x4060c0
+  401122:	83 ec 08             	sub    $0x8,%esp
+  401125:	89 c2                	mov    %eax,%edx
+  401127:	85 d2                	test   %edx,%edx
+  401129:	74 09                	je     401134 <___gcc_register_frame+0xa4>
+  40112b:	c7 04 24 20 20 40 00 	movl   $0x402020,(%esp)
+  401132:	ff d2                	call   *%edx
+  401134:	8d 65 f8             	lea    -0x8(%ebp),%esp
+  401137:	5b                   	pop    %ebx
+  401138:	5e                   	pop    %esi
+  401139:	5d                   	pop    %ebp
+  40113a:	c3                   	ret    
+  40113b:	90                   	nop
+  40113c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+
+00401140 <___gcc_deregister_frame>:
+  401140:	55                   	push   %ebp
+  401141:	b8 00 00 00 00       	mov    $0x0,%eax
+  401146:	89 e5                	mov    %esp,%ebp
+  401148:	83 ec 18             	sub    $0x18,%esp
+  40114b:	8b 15 18 50 40 00    	mov    0x405018,%edx
+  401151:	85 d2                	test   %edx,%edx
+  401153:	74 14                	je     401169 <___gcc_deregister_frame+0x29>
+  401155:	c7 44 24 04 47 30 40 	movl   $0x403047,0x4(%esp)
+  40115c:	00 
+  40115d:	89 14 24             	mov    %edx,(%esp)
+  401160:	ff 15 c0 60 40 00    	call   *0x4060c0
+  401166:	83 ec 08             	sub    $0x8,%esp
+  401169:	85 c0                	test   %eax,%eax
+  40116b:	74 09                	je     401176 <___gcc_deregister_frame+0x36>
+  40116d:	c7 04 24 38 40 40 00 	movl   $0x404038,(%esp)
+  401174:	ff d0                	call   *%eax
+  401176:	a1 18 50 40 00       	mov    0x405018,%eax
+  40117b:	85 c0                	test   %eax,%eax
+  40117d:	74 0c                	je     40118b <___gcc_deregister_frame+0x4b>
+  40117f:	89 04 24             	mov    %eax,(%esp)
+  401182:	ff 15 b8 60 40 00    	call   *0x4060b8
+  401188:	83 ec 04             	sub    $0x4,%esp
+  40118b:	c9                   	leave  
+  40118c:	c3                   	ret    
+  40118d:	90                   	nop
+  40118e:	90                   	nop
+  40118f:	90                   	nop
+
+00401190 <_main>:
+  401190:	55                   	push   %ebp
+  401191:	89 e5                	mov    %esp,%ebp
+  401193:	83 e4 f0             	and    $0xfffffff0,%esp
+  401196:	83 ec 20             	sub    $0x20,%esp
+  401199:	e8 d2 00 00 00       	call   401270 <___main>
+  40119e:	c7 44 24 1c 00 00 00 	movl   $0x0,0x1c(%esp)
+  4011a5:	00 
+
+  4011a6:	c7 44 24 1c 00 00 00 	movl   $0x0,0x1c(%esp)
+  4011ad:	00 
+  4011ae:	83 7c 24 1c 00       	cmpl   $0x0,0x1c(%esp)
+  4011b3:	75 14                	jne    4011c9 <_main+0x39>
+  4011b5:	8b 44 24 1c          	mov    0x1c(%esp),%eax
+  4011b9:	89 44 24 04          	mov    %eax,0x4(%esp)
+  4011bd:	c7 04 24 60 30 40 00 	movl   $0x403060,(%esp)
+  4011c4:	e8 af 00 00 00       	call   401278 <_printf>
+
+
+  4011c9:	c7 44 24 1c 00 00 00 	movl   $0x0,0x1c(%esp)
+  4011d0:	00 
+  4011d1:	83 7c 24 1c 00       	cmpl   $0x0,0x1c(%esp)
+  4011d6:	75 14                	jne    4011ec <_main+0x5c>
+  4011d8:	8b 44 24 1c          	mov    0x1c(%esp),%eax
+  4011dc:	89 44 24 04          	mov    %eax,0x4(%esp)
+  4011e0:	c7 04 24 60 30 40 00 	movl   $0x403060,(%esp)
+  4011e7:	e8 8c 00 00 00       	call   401278 <_printf>
+
+
+  4011ec:	b8 00 00 00 00       	mov    $0x0,%eax
+  4011f1:	c9                   	leave  
+  4011f2:	c3                   	ret    
+  4011f3:	90                   	nop
+  4011f4:	66 90                	xchg   %ax,%ax
+  4011f6:	66 90                	xchg   %ax,%ax
+  4011f8:	66 90                	xchg   %ax,%ax
+  4011fa:	66 90                	xchg   %ax,%ax
+  4011fc:	66 90                	xchg   %ax,%ax
+  4011fe:	66 90                	xchg   %ax,%ax
+
+00401200 <_cygwin_crt0>:
+  401200:	55                   	push   %ebp
+  401201:	89 e5                	mov    %esp,%ebp
+  401203:	83 ec 18             	sub    $0x18,%esp
+  401206:	8b 45 08             	mov    0x8(%ebp),%eax
+  401209:	c7 44 24 04 00 00 00 	movl   $0x0,0x4(%esp)
+  401210:	00 
+  401211:	89 04 24             	mov    %eax,(%esp)
+  401214:	e8 67 00 00 00       	call   401280 <__cygwin_crt0_common@8>
+  401219:	83 ec 08             	sub    $0x8,%esp
+  40121c:	ff 15 88 60 40 00    	call   *0x406088
+  401222:	90                   	nop
+  401223:	90                   	nop
+  401224:	90                   	nop
+  401225:	90                   	nop
+  401226:	90                   	nop
+  401227:	90                   	nop
+  401228:	90                   	nop
+  401229:	90                   	nop
+  40122a:	90                   	nop
+  40122b:	90                   	nop
+  40122c:	90                   	nop
+  40122d:	90                   	nop
+  40122e:	90                   	nop
+  40122f:	90                   	nop
+
+00401230 <_cygwin_premain0>:
+  401230:	f3 c3                	repz ret 
+  401232:	90                   	nop
+  401233:	90                   	nop
+  401234:	90                   	nop
+  401235:	90                   	nop
+  401236:	90                   	nop
+  401237:	90                   	nop
+  401238:	90                   	nop
+  401239:	90                   	nop
+  40123a:	90                   	nop
+  40123b:	90                   	nop
+  40123c:	90                   	nop
+  40123d:	90                   	nop
+  40123e:	90                   	nop
+  40123f:	90                   	nop
+
+00401240 <_cygwin_premain1>:
+  401240:	f3 c3                	repz ret 
+  401242:	90                   	nop
+  401243:	90                   	nop
+  401244:	90                   	nop
+  401245:	90                   	nop
+  401246:	90                   	nop
+  401247:	90                   	nop
+  401248:	90                   	nop
+  401249:	90                   	nop
+  40124a:	90                   	nop
+  40124b:	90                   	nop
+  40124c:	90                   	nop
+  40124d:	90                   	nop
+  40124e:	90                   	nop
+  40124f:	90                   	nop
+
+00401250 <_cygwin_premain2>:
+  401250:	f3 c3                	repz ret 
+  401252:	90                   	nop
+  401253:	90                   	nop
+  401254:	90                   	nop
+  401255:	90                   	nop
+  401256:	90                   	nop
+  401257:	90                   	nop
+  401258:	90                   	nop
+  401259:	90                   	nop
+  40125a:	90                   	nop
+  40125b:	90                   	nop
+  40125c:	90                   	nop
+  40125d:	90                   	nop
+  40125e:	90                   	nop
+  40125f:	90                   	nop
+
+00401260 <_cygwin_premain3>:
+  401260:	f3 c3                	repz ret 
+  401262:	90                   	nop
+  401263:	90                   	nop
+  401264:	90                   	nop
+  401265:	90                   	nop
+  401266:	90                   	nop
+  401267:	90                   	nop
+  401268:	90                   	nop
+  401269:	90                   	nop
+  40126a:	90                   	nop
+  40126b:	90                   	nop
+  40126c:	90                   	nop
+  40126d:	90                   	nop
+  40126e:	90                   	nop
+  40126f:	90                   	nop
+
+00401270 <___main>:
+  401270:	ff 25 84 60 40 00    	jmp    *0x406084
+  401276:	90                   	nop
+  401277:	90                   	nop
+
+00401278 <_printf>:
+  401278:	ff 25 ac 60 40 00    	jmp    *0x4060ac
+  40127e:	90                   	nop
+  40127f:	90                   	nop
+
+00401280 <__cygwin_crt0_common@8>:
+  401280:	55                   	push   %ebp
+  401281:	89 e5                	mov    %esp,%ebp
+  401283:	53                   	push   %ebx
+  401284:	83 ec 14             	sub    $0x14,%esp
+  401287:	8b 5d 0c             	mov    0xc(%ebp),%ebx
+  40128a:	c7 04 24 08 00 00 00 	movl   $0x8,(%esp)
+  401291:	e8 2a 04 00 00       	call   4016c0 <_cygwin_internal>
+  401296:	85 db                	test   %ebx,%ebx
+  401298:	0f 84 c8 01 00 00    	je     401466 <__cygwin_crt0_common@8+0x1e6>
+  40129e:	8b 15 8c 60 40 00    	mov    0x40608c,%edx
+  4012a4:	85 c0                	test   %eax,%eax
+  4012a6:	8b 4d 08             	mov    0x8(%ebp),%ecx
+  4012a9:	c7 43 04 a8 00 00 00 	movl   $0xa8,0x4(%ebx)
+  4012b0:	c7 43 08 ef 03 00 00 	movl   $0x3ef,0x8(%ebx)
+  4012b7:	89 53 10             	mov    %edx,0x10(%ebx)
+  4012ba:	8b 55 00             	mov    0x0(%ebp),%edx
+  4012bd:	c7 43 0c 1d 00 00 00 	movl   $0x1d,0xc(%ebx)
+  4012c4:	c7 83 80 00 00 00 00 	movl   $0x0,0x80(%ebx)
+  4012cb:	00 00 00 
+  4012ce:	c7 83 84 00 00 00 10 	movl   $0x110,0x84(%ebx)
+  4012d5:	01 00 00 
+  4012d8:	c7 43 2c 90 17 40 00 	movl   $0x401790,0x2c(%ebx)
+  4012df:	c7 43 30 9c 17 40 00 	movl   $0x40179c,0x30(%ebx)
+  4012e6:	c7 43 14 20 50 40 00 	movl   $0x405020,0x14(%ebx)
+  4012ed:	89 4b 28             	mov    %ecx,0x28(%ebx)
+  4012f0:	c7 43 48 30 12 40 00 	movl   $0x401230,0x48(%ebx)
+  4012f7:	c7 43 4c 40 12 40 00 	movl   $0x401240,0x4c(%ebx)
+  4012fe:	c7 43 50 50 12 40 00 	movl   $0x401250,0x50(%ebx)
+  401305:	c7 43 54 60 12 40 00 	movl   $0x401260,0x54(%ebx)
+  40130c:	c7 43 24 1c 50 40 00 	movl   $0x40501c,0x24(%ebx)
+  401313:	89 13                	mov    %edx,(%ebx)
+  401315:	c7 43 18 c8 16 40 00 	movl   $0x4016c8,0x18(%ebx)
+  40131c:	c7 43 1c d0 16 40 00 	movl   $0x4016d0,0x1c(%ebx)
+  401323:	c7 43 20 d8 16 40 00 	movl   $0x4016d8,0x20(%ebx)
+  40132a:	c7 43 44 e0 16 40 00 	movl   $0x4016e0,0x44(%ebx)
+  401331:	c7 83 90 00 00 00 e8 	movl   $0x4016e8,0x90(%ebx)
+  401338:	16 40 00 
+  40133b:	0f 84 c1 00 00 00    	je     401402 <__cygwin_crt0_common@8+0x182>
+  401341:	8b 50 78             	mov    0x78(%eax),%edx
+  401344:	85 d2                	test   %edx,%edx
+  401346:	0f 84 b6 00 00 00    	je     401402 <__cygwin_crt0_common@8+0x182>
+  40134c:	8b 0d 24 50 40 00    	mov    0x405024,%ecx
+  401352:	85 c9                	test   %ecx,%ecx
+  401354:	0f 85 a8 00 00 00    	jne    401402 <__cygwin_crt0_common@8+0x182>
+  40135a:	a1 00 20 40 00       	mov    0x402000,%eax
+  40135f:	85 c0                	test   %eax,%eax
+  401361:	0f 84 29 02 00 00    	je     401590 <__cygwin_crt0_common@8+0x310>
+  401367:	a1 04 20 40 00       	mov    0x402004,%eax
+  40136c:	85 c0                	test   %eax,%eax
+  40136e:	0f 84 0c 02 00 00    	je     401580 <__cygwin_crt0_common@8+0x300>
+  401374:	a1 08 20 40 00       	mov    0x402008,%eax
+  401379:	85 c0                	test   %eax,%eax
+  40137b:	0f 84 ef 01 00 00    	je     401570 <__cygwin_crt0_common@8+0x2f0>
+  401381:	a1 0c 20 40 00       	mov    0x40200c,%eax
+  401386:	85 c0                	test   %eax,%eax
+  401388:	0f 84 d2 01 00 00    	je     401560 <__cygwin_crt0_common@8+0x2e0>
+  40138e:	a1 10 20 40 00       	mov    0x402010,%eax
+  401393:	85 c0                	test   %eax,%eax
+  401395:	0f 84 b5 01 00 00    	je     401550 <__cygwin_crt0_common@8+0x2d0>
+  40139b:	a1 14 20 40 00       	mov    0x402014,%eax
+  4013a0:	85 c0                	test   %eax,%eax
+  4013a2:	0f 84 98 01 00 00    	je     401540 <__cygwin_crt0_common@8+0x2c0>
+  4013a8:	8b 0d 18 20 40 00    	mov    0x402018,%ecx
+  4013ae:	85 c9                	test   %ecx,%ecx
+  4013b0:	0f 84 7a 01 00 00    	je     401530 <__cygwin_crt0_common@8+0x2b0>
+  4013b6:	a1 1c 20 40 00       	mov    0x40201c,%eax
+  4013bb:	85 c0                	test   %eax,%eax
+  4013bd:	0f 84 5d 01 00 00    	je     401520 <__cygwin_crt0_common@8+0x2a0>
+  4013c3:	a1 00 20 40 00       	mov    0x402000,%eax
+  4013c8:	89 02                	mov    %eax,(%edx)
+  4013ca:	a1 04 20 40 00       	mov    0x402004,%eax
+  4013cf:	89 42 04             	mov    %eax,0x4(%edx)
+  4013d2:	a1 08 20 40 00       	mov    0x402008,%eax
+  4013d7:	89 42 08             	mov    %eax,0x8(%edx)
+  4013da:	a1 0c 20 40 00       	mov    0x40200c,%eax
+  4013df:	89 42 0c             	mov    %eax,0xc(%edx)
+  4013e2:	a1 10 20 40 00       	mov    0x402010,%eax
+  4013e7:	89 42 10             	mov    %eax,0x10(%edx)
+  4013ea:	a1 14 20 40 00       	mov    0x402014,%eax
+  4013ef:	89 42 14             	mov    %eax,0x14(%edx)
+  4013f2:	a1 18 20 40 00       	mov    0x402018,%eax
+  4013f7:	89 42 18             	mov    %eax,0x18(%edx)
+  4013fa:	a1 1c 20 40 00       	mov    0x40201c,%eax
+  4013ff:	89 42 1c             	mov    %eax,0x1c(%edx)
+  401402:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+  401409:	e8 5a 03 00 00       	call   401768 <_GetModuleHandleA@4>
+  40140e:	c7 43 34 00 20 40 00 	movl   $0x402000,0x34(%ebx)
+  401415:	c7 43 38 24 20 40 00 	movl   $0x402024,0x38(%ebx)
+  40141c:	c7 43 3c 00 50 40 00 	movl   $0x405000,0x3c(%ebx)
+  401423:	c7 43 40 10 51 40 00 	movl   $0x405110,0x40(%ebx)
+  40142a:	c7 83 94 00 00 00 f4 	movl   $0x4032f4,0x94(%ebx)
+  401431:	32 40 00 
+  401434:	83 ec 04             	sub    $0x4,%esp
+  401437:	89 43 7c             	mov    %eax,0x7c(%ebx)
+  40143a:	c7 83 98 00 00 00 f4 	movl   $0x4032f4,0x98(%ebx)
+  401441:	32 40 00 
+  401444:	c7 83 9c 00 00 00 00 	movl   $0x400000,0x9c(%ebx)
+  40144b:	00 40 00 
+  40144e:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+  401455:	e8 96 02 00 00       	call   4016f0 <__pei386_runtime_relocator>
+  40145a:	b8 01 00 00 00       	mov    $0x1,%eax
+  40145f:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+  401462:	c9                   	leave  
+  401463:	c2 08 00             	ret    $0x8
+  401466:	8b 88 a4 00 00 00    	mov    0xa4(%eax),%ecx
+  40146c:	85 c0                	test   %eax,%eax
+  40146e:	8b 15 8c 60 40 00    	mov    0x40608c,%edx
+  401474:	c7 40 04 a8 00 00 00 	movl   $0xa8,0x4(%eax)
+  40147b:	c7 40 08 ef 03 00 00 	movl   $0x3ef,0x8(%eax)
+  401482:	c7 40 0c 1d 00 00 00 	movl   $0x1d,0xc(%eax)
+  401489:	89 0a                	mov    %ecx,(%edx)
+  40148b:	8b 55 00             	mov    0x0(%ebp),%edx
+  40148e:	8b 4d 08             	mov    0x8(%ebp),%ecx
+  401491:	c7 80 80 00 00 00 00 	movl   $0x0,0x80(%eax)
+  401498:	00 00 00 
+  40149b:	c7 80 84 00 00 00 10 	movl   $0x110,0x84(%eax)
+  4014a2:	01 00 00 
+  4014a5:	c7 40 2c 90 17 40 00 	movl   $0x401790,0x2c(%eax)
+  4014ac:	c7 40 30 9c 17 40 00 	movl   $0x40179c,0x30(%eax)
+  4014b3:	c7 40 14 20 50 40 00 	movl   $0x405020,0x14(%eax)
+  4014ba:	89 48 28             	mov    %ecx,0x28(%eax)
+  4014bd:	c7 40 48 30 12 40 00 	movl   $0x401230,0x48(%eax)
+  4014c4:	c7 40 4c 40 12 40 00 	movl   $0x401240,0x4c(%eax)
+  4014cb:	c7 40 50 50 12 40 00 	movl   $0x401250,0x50(%eax)
+  4014d2:	c7 40 54 60 12 40 00 	movl   $0x401260,0x54(%eax)
+  4014d9:	c7 40 24 1c 50 40 00 	movl   $0x40501c,0x24(%eax)
+  4014e0:	89 10                	mov    %edx,(%eax)
+  4014e2:	c7 40 18 c8 16 40 00 	movl   $0x4016c8,0x18(%eax)
+  4014e9:	c7 40 1c d0 16 40 00 	movl   $0x4016d0,0x1c(%eax)
+  4014f0:	c7 40 20 d8 16 40 00 	movl   $0x4016d8,0x20(%eax)
+  4014f7:	c7 40 44 e0 16 40 00 	movl   $0x4016e0,0x44(%eax)
+  4014fe:	c7 80 90 00 00 00 e8 	movl   $0x4016e8,0x90(%eax)
+  401505:	16 40 00 
+  401508:	0f 84 f4 fe ff ff    	je     401402 <__cygwin_crt0_common@8+0x182>
+  40150e:	8b 50 78             	mov    0x78(%eax),%edx
+  401511:	89 c3                	mov    %eax,%ebx
+  401513:	85 d2                	test   %edx,%edx
+  401515:	0f 85 31 fe ff ff    	jne    40134c <__cygwin_crt0_common@8+0xcc>
+  40151b:	e9 e2 fe ff ff       	jmp    401402 <__cygwin_crt0_common@8+0x182>
+  401520:	8b 42 1c             	mov    0x1c(%edx),%eax
+  401523:	a3 1c 20 40 00       	mov    %eax,0x40201c
+  401528:	e9 96 fe ff ff       	jmp    4013c3 <__cygwin_crt0_common@8+0x143>
+  40152d:	8d 76 00             	lea    0x0(%esi),%esi
+  401530:	8b 42 18             	mov    0x18(%edx),%eax
+  401533:	a3 18 20 40 00       	mov    %eax,0x402018
+  401538:	e9 79 fe ff ff       	jmp    4013b6 <__cygwin_crt0_common@8+0x136>
+  40153d:	8d 76 00             	lea    0x0(%esi),%esi
+  401540:	8b 42 14             	mov    0x14(%edx),%eax
+  401543:	a3 14 20 40 00       	mov    %eax,0x402014
+  401548:	e9 5b fe ff ff       	jmp    4013a8 <__cygwin_crt0_common@8+0x128>
+  40154d:	8d 76 00             	lea    0x0(%esi),%esi
+  401550:	8b 42 10             	mov    0x10(%edx),%eax
+  401553:	a3 10 20 40 00       	mov    %eax,0x402010
+  401558:	e9 3e fe ff ff       	jmp    40139b <__cygwin_crt0_common@8+0x11b>
+  40155d:	8d 76 00             	lea    0x0(%esi),%esi
+  401560:	8b 42 0c             	mov    0xc(%edx),%eax
+  401563:	a3 0c 20 40 00       	mov    %eax,0x40200c
+  401568:	e9 21 fe ff ff       	jmp    40138e <__cygwin_crt0_common@8+0x10e>
+  40156d:	8d 76 00             	lea    0x0(%esi),%esi
+  401570:	8b 42 08             	mov    0x8(%edx),%eax
+  401573:	a3 08 20 40 00       	mov    %eax,0x402008
+  401578:	e9 04 fe ff ff       	jmp    401381 <__cygwin_crt0_common@8+0x101>
+  40157d:	8d 76 00             	lea    0x0(%esi),%esi
+  401580:	8b 42 04             	mov    0x4(%edx),%eax
+  401583:	a3 04 20 40 00       	mov    %eax,0x402004
+  401588:	e9 e7 fd ff ff       	jmp    401374 <__cygwin_crt0_common@8+0xf4>
+  40158d:	8d 76 00             	lea    0x0(%esi),%esi
+  401590:	8b 02                	mov    (%edx),%eax
+  401592:	a3 00 20 40 00       	mov    %eax,0x402000
+  401597:	e9 cb fd ff ff       	jmp    401367 <__cygwin_crt0_common@8+0xe7>
+  40159c:	90                   	nop
+  40159d:	90                   	nop
+  40159e:	90                   	nop
+  40159f:	90                   	nop
+
+004015a0 <___dllMain>:
+  4015a0:	55                   	push   %ebp
+  4015a1:	89 e5                	mov    %esp,%ebp
+  4015a3:	83 ec 18             	sub    $0x18,%esp
+  4015a6:	a1 2c 50 40 00       	mov    0x40502c,%eax
+  4015ab:	89 44 24 08          	mov    %eax,0x8(%esp)
+  4015af:	a1 30 50 40 00       	mov    0x405030,%eax
+  4015b4:	89 44 24 04          	mov    %eax,0x4(%esp)
+  4015b8:	a1 34 50 40 00       	mov    0x405034,%eax
+  4015bd:	89 04 24             	mov    %eax,(%esp)
+  4015c0:	e8 3b 01 00 00       	call   401700 <_DllMain@12>
+  4015c5:	83 ec 0c             	sub    $0xc,%esp
+  4015c8:	c9                   	leave  
+  4015c9:	c3                   	ret    
+  4015ca:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
+
+004015d0 <__cygwin_dll_entry@12>:
+  4015d0:	55                   	push   %ebp
+  4015d1:	89 e5                	mov    %esp,%ebp
+  4015d3:	83 ec 18             	sub    $0x18,%esp
+  4015d6:	8b 45 0c             	mov    0xc(%ebp),%eax
+  4015d9:	8b 55 08             	mov    0x8(%ebp),%edx
+  4015dc:	8b 4d 10             	mov    0x10(%ebp),%ecx
+  4015df:	83 f8 01             	cmp    $0x1,%eax
+  4015e2:	74 7c                	je     401660 <__cygwin_dll_entry@12+0x90>
+  4015e4:	72 3b                	jb     401621 <__cygwin_dll_entry@12+0x51>
+  4015e6:	83 f8 02             	cmp    $0x2,%eax
+  4015e9:	74 1a                	je     401605 <__cygwin_dll_entry@12+0x35>
+  4015eb:	83 f8 03             	cmp    $0x3,%eax
+  4015ee:	66 90                	xchg   %ax,%ax
+  4015f0:	75 26                	jne    401618 <__cygwin_dll_entry@12+0x48>
+  4015f2:	89 4d 10             	mov    %ecx,0x10(%ebp)
+  4015f5:	c7 45 0c 03 00 00 00 	movl   $0x3,0xc(%ebp)
+  4015fc:	89 55 08             	mov    %edx,0x8(%ebp)
+  4015ff:	c9                   	leave  
+  401600:	e9 fb 00 00 00       	jmp    401700 <_DllMain@12>
+  401605:	89 4d 10             	mov    %ecx,0x10(%ebp)
+  401608:	c7 45 0c 02 00 00 00 	movl   $0x2,0xc(%ebp)
+  40160f:	89 55 08             	mov    %edx,0x8(%ebp)
+  401612:	c9                   	leave  
+  401613:	e9 e8 00 00 00       	jmp    401700 <_DllMain@12>
+  401618:	b8 01 00 00 00       	mov    $0x1,%eax
+  40161d:	c9                   	leave  
+  40161e:	c2 0c 00             	ret    $0xc
+  401621:	89 4c 24 08          	mov    %ecx,0x8(%esp)
+  401625:	c7 44 24 04 00 00 00 	movl   $0x0,0x4(%esp)
+  40162c:	00 
+  40162d:	89 14 24             	mov    %edx,(%esp)
+  401630:	e8 cb 00 00 00       	call   401700 <_DllMain@12>
+  401635:	83 ec 0c             	sub    $0xc,%esp
+  401638:	85 c0                	test   %eax,%eax
+  40163a:	74 e1                	je     40161d <__cygwin_dll_entry@12+0x4d>
+  40163c:	8b 15 28 50 40 00    	mov    0x405028,%edx
+  401642:	89 45 f4             	mov    %eax,-0xc(%ebp)
+  401645:	89 14 24             	mov    %edx,(%esp)
+  401648:	e8 c3 00 00 00       	call   401710 <_cygwin_detach_dll>
+  40164d:	8b 45 f4             	mov    -0xc(%ebp),%eax
+  401650:	c7 05 28 50 40 00 ff 	movl   $0xffffffff,0x405028
+  401657:	ff ff ff 
+  40165a:	eb c1                	jmp    40161d <__cygwin_dll_entry@12+0x4d>
+  40165c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+  401660:	31 c0                	xor    %eax,%eax
+  401662:	85 c9                	test   %ecx,%ecx
+  401664:	0f 94 c0             	sete   %al
+  401667:	c7 44 24 04 a0 15 40 	movl   $0x4015a0,0x4(%esp)
+  40166e:	00 
+  40166f:	89 14 24             	mov    %edx,(%esp)
+  401672:	89 15 34 50 40 00    	mov    %edx,0x405034
+  401678:	c7 05 30 50 40 00 01 	movl   $0x1,0x405030
+  40167f:	00 00 00 
+  401682:	89 0d 2c 50 40 00    	mov    %ecx,0x40502c
+  401688:	a3 24 50 40 00       	mov    %eax,0x405024
+  40168d:	e8 8e 00 00 00       	call   401720 <_cygwin_attach_dll>
+  401692:	83 f8 ff             	cmp    $0xffffffff,%eax
+  401695:	a3 28 50 40 00       	mov    %eax,0x405028
+  40169a:	0f 95 c0             	setne  %al
+  40169d:	0f b6 c0             	movzbl %al,%eax
+  4016a0:	c9                   	leave  
+  4016a1:	c2 0c 00             	ret    $0xc
+  4016a4:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
+  4016aa:	8d bf 00 00 00 00    	lea    0x0(%edi),%edi
+
+004016b0 <__cygwin_noncygwin_dll_entry@12>:
+  4016b0:	55                   	push   %ebp
+  4016b1:	89 e5                	mov    %esp,%ebp
+  4016b3:	c9                   	leave  
+  4016b4:	e9 17 ff ff ff       	jmp    4015d0 <__cygwin_dll_entry@12>
+  4016b9:	90                   	nop
+  4016ba:	90                   	nop
+  4016bb:	90                   	nop
+  4016bc:	90                   	nop
+  4016bd:	90                   	nop
+  4016be:	90                   	nop
+  4016bf:	90                   	nop
+
+004016c0 <_cygwin_internal>:
+  4016c0:	ff 25 98 60 40 00    	jmp    *0x406098
+  4016c6:	90                   	nop
+  4016c7:	90                   	nop
+
+004016c8 <_malloc>:
+  4016c8:	ff 25 a4 60 40 00    	jmp    *0x4060a4
+  4016ce:	90                   	nop
+  4016cf:	90                   	nop
+
+004016d0 <_free>:
+  4016d0:	ff 25 a0 60 40 00    	jmp    *0x4060a0
+  4016d6:	90                   	nop
+  4016d7:	90                   	nop
+
+004016d8 <_realloc>:
+  4016d8:	ff 25 b0 60 40 00    	jmp    *0x4060b0
+  4016de:	90                   	nop
+  4016df:	90                   	nop
+
+004016e0 <_calloc>:
+  4016e0:	ff 25 90 60 40 00    	jmp    *0x406090
+  4016e6:	90                   	nop
+  4016e7:	90                   	nop
+
+004016e8 <_posix_memalign>:
+  4016e8:	ff 25 a8 60 40 00    	jmp    *0x4060a8
+  4016ee:	90                   	nop
+  4016ef:	90                   	nop
+
+004016f0 <__pei386_runtime_relocator>:
+  4016f0:	f3 c3                	repz ret 
+  4016f2:	90                   	nop
+  4016f3:	90                   	nop
+  4016f4:	90                   	nop
+  4016f5:	90                   	nop
+  4016f6:	90                   	nop
+  4016f7:	90                   	nop
+  4016f8:	90                   	nop
+  4016f9:	90                   	nop
+  4016fa:	90                   	nop
+  4016fb:	90                   	nop
+  4016fc:	90                   	nop
+  4016fd:	90                   	nop
+  4016fe:	90                   	nop
+  4016ff:	90                   	nop
+
+00401700 <_DllMain@12>:
+  401700:	b8 01 00 00 00       	mov    $0x1,%eax
+  401705:	c2 0c 00             	ret    $0xc
+  401708:	90                   	nop
+  401709:	90                   	nop
+  40170a:	90                   	nop
+  40170b:	90                   	nop
+  40170c:	90                   	nop
+  40170d:	90                   	nop
+  40170e:	90                   	nop
+  40170f:	90                   	nop
+
+00401710 <_cygwin_detach_dll>:
+  401710:	ff 25 94 60 40 00    	jmp    *0x406094
+  401716:	90                   	nop
+  401717:	90                   	nop
+  401718:	66 90                	xchg   %ax,%ax
+  40171a:	66 90                	xchg   %ax,%ax
+  40171c:	66 90                	xchg   %ax,%ax
+  40171e:	66 90                	xchg   %ax,%ax
+
+00401720 <_cygwin_attach_dll>:
+  401720:	55                   	push   %ebp
+  401721:	89 e5                	mov    %esp,%ebp
+  401723:	53                   	push   %ebx
+  401724:	83 ec 14             	sub    $0x14,%esp
+  401727:	8b 45 0c             	mov    0xc(%ebp),%eax
+  40172a:	c7 44 24 04 40 50 40 	movl   $0x405040,0x4(%esp)
+  401731:	00 
+  401732:	8b 5d 08             	mov    0x8(%ebp),%ebx
+  401735:	89 04 24             	mov    %eax,(%esp)
+  401738:	e8 43 fb ff ff       	call   401280 <__cygwin_crt0_common@8>
+  40173d:	89 5d 08             	mov    %ebx,0x8(%ebp)
+  401740:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+  401743:	c7 45 0c 40 50 40 00 	movl   $0x405040,0xc(%ebp)
+  40174a:	83 ec 08             	sub    $0x8,%esp
+  40174d:	c9                   	leave  
+  40174e:	e9 0d 00 00 00       	jmp    401760 <_dll_dllcrt0>
+  401753:	90                   	nop
+  401754:	90                   	nop
+  401755:	90                   	nop
+  401756:	90                   	nop
+  401757:	90                   	nop
+  401758:	90                   	nop
+  401759:	90                   	nop
+  40175a:	90                   	nop
+  40175b:	90                   	nop
+  40175c:	90                   	nop
+  40175d:	90                   	nop
+  40175e:	90                   	nop
+  40175f:	90                   	nop
+
+00401760 <_dll_dllcrt0>:
+  401760:	ff 25 9c 60 40 00    	jmp    *0x40609c
+  401766:	90                   	nop
+  401767:	90                   	nop
+
+00401768 <_GetModuleHandleA@4>:
+  401768:	ff 25 bc 60 40 00    	jmp    *0x4060bc
+  40176e:	90                   	nop
+  40176f:	90                   	nop
+
+00401770 <_register_frame_ctor>:
+  401770:	55                   	push   %ebp
+  401771:	89 e5                	mov    %esp,%ebp
+  401773:	5d                   	pop    %ebp
+  401774:	e9 17 f9 ff ff       	jmp    401090 <___gcc_register_frame>
+  401779:	90                   	nop
+  40177a:	90                   	nop
+  40177b:	90                   	nop
+  40177c:	90                   	nop
+  40177d:	90                   	nop
+  40177e:	90                   	nop
+  40177f:	90                   	nop
+
+00401780 <_deregister_frame_dtor>:
+  401780:	55                   	push   %ebp
+  401781:	89 e5                	mov    %esp,%ebp
+  401783:	5d                   	pop    %ebp
+  401784:	e9 b7 f9 ff ff       	jmp    401140 <___gcc_deregister_frame>
+  401789:	90                   	nop
+  40178a:	90                   	nop
+  40178b:	90                   	nop
+  40178c:	90                   	nop
+  40178d:	90                   	nop
+  40178e:	90                   	nop
+  40178f:	90                   	nop
+
+00401790 <__CTOR_LIST__>:
+  401790:	ff                   	(bad)  
+  401791:	ff                   	(bad)  
+  401792:	ff                   	(bad)  
+  401793:	ff 70 17             	pushl  0x17(%eax)
+
+00401794 <.ctors.65535>:
+  401794:	70 17                	jo     4017ad <.dtors.65535+0xd>
+  401796:	40                   	inc    %eax
+  401797:	00 00                	add    %al,(%eax)
+  401799:	00 00                	add    %al,(%eax)
+	...
+
+0040179c <__DTOR_LIST__>:
+  40179c:	ff                   	(bad)  
+  40179d:	ff                   	(bad)  
+  40179e:	ff                   	(bad)  
+  40179f:	ff 80 17 40 00 00    	incl   0x4017(%eax)
+
+004017a0 <.dtors.65535>:
+  4017a0:	80 17 40             	adcb   $0x40,(%edi)
+  4017a3:	00 00                	add    %al,(%eax)
+  4017a5:	00 00                	add    %al,(%eax)
+	...
